@@ -367,6 +367,12 @@ To add more commands:
 
 ## 🧪 Testing
 
+### Quick Demo (No Training Required):
+```bash
+# See how the architecture works without training
+python demo.py
+```
+
 ### Manual Testing:
 ```bash
 # Test training
@@ -385,6 +391,8 @@ python scripts/inference.py --input "show files"
 ### Accuracy Evaluation:
 The training script automatically shows inference examples every 10 epochs and at the end of training. Monitor these to assess model quality.
 
+For comprehensive testing instructions, see [TESTING.md](TESTING.md).
+
 ## 🤝 Contributing
 
 Contributions are welcome! Areas for improvement:
@@ -398,6 +406,13 @@ Contributions are welcome! Areas for improvement:
 ## 📄 License
 
 This project is provided as-is for educational and research purposes.
+
+## 📚 Additional Documentation
+
+- **[DEPLOYMENT.md](DEPLOYMENT.md)**: Comprehensive guide for embedded deployment, hardware-specific optimizations, and production best practices
+- **[LORA_GUIDE.md](LORA_GUIDE.md)**: Guide for fine-tuning larger pretrained models using LoRA (Low-Rank Adaptation)
+- **[TESTING.md](TESTING.md)**: Complete testing guide with unit tests, integration tests, and benchmarking instructions
+- **[demo.py](demo.py)**: Quick demonstration of model architecture without training
 
 ## 🙏 Acknowledgments
 
