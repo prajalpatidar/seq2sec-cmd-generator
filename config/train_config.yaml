@@ -1,0 +1,21 @@
+# Training configuration for seq2seq model
+# Optimized for embedded systems deployment
+
+# Model hyperparameters
+embedding_dim: 64        # Small embedding dimension for memory efficiency
+hidden_dim: 128          # Small hidden dimension for faster inference
+num_layers: 1            # Single layer to reduce model size
+
+# Training hyperparameters
+batch_size: 16
+num_epochs: 50
+learning_rate: 0.001
+teacher_forcing_ratio: 0.5
+
+# Data parameters
+max_vocab_size: 1000     # Limited vocabulary for embedded systems
+train_split: 0.8
+
+# Optimization
+weight_decay: 0.0001
+gradient_clip: 1.0

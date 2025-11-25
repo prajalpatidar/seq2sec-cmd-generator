@@ -1,0 +1,383 @@
+[
+  {
+    "input": "show network interfaces",
+    "output": "ifconfig"
+  },
+  {
+    "input": "list all network interfaces",
+    "output": "ip link show"
+  },
+  {
+    "input": "display ip address",
+    "output": "ip addr show"
+  },
+  {
+    "input": "show network configuration",
+    "output": "ip a"
+  },
+  {
+    "input": "check listening ports",
+    "output": "netstat -tuln"
+  },
+  {
+    "input": "show active network connections",
+    "output": "ss -tuln"
+  },
+  {
+    "input": "display routing table",
+    "output": "route -n"
+  },
+  {
+    "input": "show ip routing",
+    "output": "ip route show"
+  },
+  {
+    "input": "test network connectivity",
+    "output": "ping -c 4 google.com"
+  },
+  {
+    "input": "trace network route",
+    "output": "traceroute google.com"
+  },
+  {
+    "input": "list running processes",
+    "output": "ps aux"
+  },
+  {
+    "input": "show all processes",
+    "output": "ps -ef"
+  },
+  {
+    "input": "display process tree",
+    "output": "pstree"
+  },
+  {
+    "input": "show top processes by cpu",
+    "output": "top"
+  },
+  {
+    "input": "monitor system resources",
+    "output": "htop"
+  },
+  {
+    "input": "kill process by name",
+    "output": "pkill process_name"
+  },
+  {
+    "input": "kill process by id",
+    "output": "kill -9 PID"
+  },
+  {
+    "input": "find process by name",
+    "output": "pgrep process_name"
+  },
+  {
+    "input": "show process information",
+    "output": "ps -p PID -o pid,ppid,cmd,%mem,%cpu"
+  },
+  {
+    "input": "list background jobs",
+    "output": "jobs"
+  },
+  {
+    "input": "check disk usage",
+    "output": "df -h"
+  },
+  {
+    "input": "show disk space",
+    "output": "df -h"
+  },
+  {
+    "input": "display directory size",
+    "output": "du -sh *"
+  },
+  {
+    "input": "check folder size",
+    "output": "du -h --max-depth=1"
+  },
+  {
+    "input": "list mounted filesystems",
+    "output": "mount | column -t"
+  },
+  {
+    "input": "show block devices",
+    "output": "lsblk"
+  },
+  {
+    "input": "check disk partitions",
+    "output": "fdisk -l"
+  },
+  {
+    "input": "display inode usage",
+    "output": "df -i"
+  },
+  {
+    "input": "find large files",
+    "output": "find / -type f -size +100M"
+  },
+  {
+    "input": "search for big files",
+    "output": "find . -type f -size +50M -exec ls -lh {} \
+  ;"
+  },
+  {
+    "input": "show system information",
+    "output": "uname -a"
+  },
+  {
+    "input": "display kernel version",
+    "output": "uname -r"
+  },
+  {
+    "input": "check os version",
+    "output": "cat /etc/os-release"
+  },
+  {
+    "input": "show system uptime",
+    "output": "uptime"
+  },
+  {
+    "input": "display memory usage",
+    "output": "free -h"
+  },
+  {
+    "input": "check ram usage",
+    "output": "free -m"
+  },
+  {
+    "input": "show cpu information",
+    "output": "lscpu"
+  },
+  {
+    "input": "display hardware info",
+    "output": "lshw -short"
+  },
+  {
+    "input": "check system load",
+    "output": "uptime"
+  },
+  {
+    "input": "show logged in users",
+    "output": "who"
+  },
+  {
+    "input": "list files in directory",
+    "output": "ls -la"
+  },
+  {
+    "input": "show hidden files",
+    "output": "ls -a"
+  },
+  {
+    "input": "list files with details",
+    "output": "ls -lh"
+  },
+  {
+    "input": "find file by name",
+    "output": "find . -name filename"
+  },
+  {
+    "input": "search for file",
+    "output": "locate filename"
+  },
+  {
+    "input": "count files in directory",
+    "output": "ls -1 | wc -l"
+  },
+  {
+    "input": "display file contents",
+    "output": "cat filename"
+  },
+  {
+    "input": "show file permissions",
+    "output": "ls -l filename"
+  },
+  {
+    "input": "change file permissions",
+    "output": "chmod 755 filename"
+  },
+  {
+    "input": "change file owner",
+    "output": "chown user:group filename"
+  },
+  {
+    "input": "create directory",
+    "output": "mkdir dirname"
+  },
+  {
+    "input": "remove directory",
+    "output": "rm -rf dirname"
+  },
+  {
+    "input": "copy file",
+    "output": "cp source dest"
+  },
+  {
+    "input": "move file",
+    "output": "mv source dest"
+  },
+  {
+    "input": "compress files",
+    "output": "tar -czf archive.tar.gz files"
+  },
+  {
+    "input": "extract tar archive",
+    "output": "tar -xzf archive.tar.gz"
+  },
+  {
+    "input": "show environment variables",
+    "output": "printenv"
+  },
+  {
+    "input": "display path variable",
+    "output": "echo $PATH"
+  },
+  {
+    "input": "check command location",
+    "output": "which command"
+  },
+  {
+    "input": "show command manual",
+    "output": "man command"
+  },
+  {
+    "input": "search in files",
+    "output": "grep -r pattern ."
+  },
+  {
+    "input": "find text in files",
+    "output": "grep -rn 'text' *"
+  },
+  {
+    "input": "count lines in file",
+    "output": "wc -l filename"
+  },
+  {
+    "input": "display first lines",
+    "output": "head -n 10 filename"
+  },
+  {
+    "input": "show last lines",
+    "output": "tail -n 10 filename"
+  },
+  {
+    "input": "follow log file",
+    "output": "tail -f /var/log/syslog"
+  },
+  {
+    "input": "show system logs",
+    "output": "journalctl -xe"
+  },
+  {
+    "input": "check service status",
+    "output": "systemctl status service_name"
+  },
+  {
+    "input": "start service",
+    "output": "systemctl start service_name"
+  },
+  {
+    "input": "stop service",
+    "output": "systemctl stop service_name"
+  },
+  {
+    "input": "restart service",
+    "output": "systemctl restart service_name"
+  },
+  {
+    "input": "enable service at boot",
+    "output": "systemctl enable service_name"
+  },
+  {
+    "input": "list all services",
+    "output": "systemctl list-units --type=service"
+  },
+  {
+    "input": "show firewall status",
+    "output": "ufw status"
+  },
+  {
+    "input": "list iptables rules",
+    "output": "iptables -L -v -n"
+  },
+  {
+    "input": "show ssh connections",
+    "output": "ss -tn state established '( dport = :22 or sport = :22 )'"
+  },
+  {
+    "input": "check dns resolution",
+    "output": "nslookup google.com"
+  },
+  {
+    "input": "query dns records",
+    "output": "dig google.com"
+  },
+  {
+    "input": "show current directory",
+    "output": "pwd"
+  },
+  {
+    "input": "change directory to home",
+    "output": "cd ~"
+  },
+  {
+    "input": "go to parent directory",
+    "output": "cd .."
+  },
+  {
+    "input": "clear terminal screen",
+    "output": "clear"
+  },
+  {
+    "input": "show command history",
+    "output": "history"
+  },
+  {
+    "input": "download file from url",
+    "output": "wget url"
+  },
+  {
+    "input": "fetch file with curl",
+    "output": "curl -O url"
+  },
+  {
+    "input": "check website status",
+    "output": "curl -I https://example.com"
+  },
+  {
+    "input": "show date and time",
+    "output": "date"
+  },
+  {
+    "input": "display calendar",
+    "output": "cal"
+  },
+  {
+    "input": "synchronize system time",
+    "output": "ntpdate pool.ntp.org"
+  },
+  {
+    "input": "show timezone",
+    "output": "timedatectl"
+  },
+  {
+    "input": "list usb devices",
+    "output": "lsusb"
+  },
+  {
+    "input": "show pci devices",
+    "output": "lspci"
+  },
+  {
+    "input": "display kernel messages",
+    "output": "dmesg | tail"
+  },
+  {
+    "input": "check battery status",
+    "output": "acpi -b"
+  },
+  {
+    "input": "show temperature sensors",
+    "output": "sensors"
+  }
+]
