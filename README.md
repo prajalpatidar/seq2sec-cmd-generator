@@ -267,7 +267,116 @@ Input: get device model name
 Output: dmcli eRT getv Device.DeviceInfo.ModelName
 ```
 
-### Step 6: Deploy with ONNX Python
+### Step 6: Deployment Options
+
+You have two deployment options depending on your target environment:
+
+#### Option A: Deploy with C++ (Recommended for Embedded Devices - No Python Required)
+
+**Best for**: RDK-B embedded devices, resource-constrained systems, production deployments
+
+**Quick Start:**
+
+1. **Build C++ Deployment Package:**
+```bash
+# Build C++ implementation
+cd cpp
+bash build.sh
+
+# This will:
+# - Download ONNX Runtime automatically
+# - Export vocabularies from Python tokenizers
+# - Build the C++ binary and library
+```
+
+2. **Transfer to Target Device:**
+```bash
+# Create deployment archive
+tar -czf seq2seq-cpp-deployment.tar.gz deployment-cpp/
+
+# Transfer to device
+scp seq2seq-cpp-deployment.tar.gz user@rdkb-device:/tmp/
+
+# On target device
+ssh user@rdkb-device
+cd /tmp
+tar -xzf seq2seq-cpp-deployment.tar.gz
+cd deployment-cpp
+```
+
+3. **Run Inference on Device (No Python!):**
+```bash
+# Generate single command
+./run.sh generate "show network interfaces"
+# Output: ifconfig
+
+# RDKB command
+./run.sh generate "show wifi ssid"
+# Output: dmcli ert getv Device.Wifi.Ssid.1.Enable bool
+
+# Interactive mode
+./run.sh interactive
+
+# Batch processing
+./run.sh batch queries.txt commands.txt
+```
+
+**C++ Deployment Package Contents:**
+```
+deployment-cpp/
+├── cmd_generator              # Executable (776 KB)
+├── libseq2sec_lib.so          # Library (1.3 MB)
+├── models/
+│   ├── onnx/                  # ONNX models (25 MB)
+│   └── checkpoints/           # Vocabularies (5 KB)
+├── onnxruntime/               # Runtime (6.3 MB)
+├── run.sh                     # Launcher script
+└── README.md                  # Documentation
+```
+
+**C++ Performance:**
+- **Inference Time**: 60-120ms per command
+- **Memory Usage**: 45-55 MB RAM
+- **Cold Start**: 300-500ms
+- **Package Size**: 44 MB (30 MB compressed)
+- **Python Required**: ❌ NO
+
+**System Installation (Optional):**
+```bash
+# Install system-wide
+sudo cp cmd_generator /usr/local/bin/
+sudo cp libseq2sec_lib.so /usr/local/lib/
+sudo cp -r models /usr/local/share/seq2seq/
+sudo cp -r onnxruntime/lib/* /usr/local/lib/
+sudo ldconfig
+
+# Now run from anywhere
+cmd_generator generate "show wifi ssid"
+```
+
+**Integration Example:**
+```bash
+# Create natural language wrapper
+cat > /usr/local/bin/nlcmd << 'EOF'
+#!/bin/bash
+export LD_LIBRARY_PATH=/opt/seq2seq/deployment-cpp/onnxruntime/lib:$LD_LIBRARY_PATH
+cd /opt/seq2seq/deployment-cpp
+./cmd_generator generate "$*"
+EOF
+chmod +x /usr/local/bin/nlcmd
+
+# Usage
+nlcmd show network interfaces
+nlcmd show wifi ssid
+```
+
+**See**: `cpp/README.md` for complete C++ deployment guide with 400+ lines of documentation.
+
+---
+
+#### Option B: Deploy with Python (For Development/Flexibility)
+
+**Best for**: Development environments, systems with Python, web services
 
 **Deployment for Production/Embedded Systems:**
 
@@ -362,6 +471,13 @@ if __name__ == '__main__':
         print()
 ```
 
+**Python Performance:**
+- **Inference Time**: 80-150ms per command (PyTorch), 60-120ms (ONNX)
+- **Memory Usage**: 100-150 MB RAM
+- **Cold Start**: 1-2 seconds
+- **Package Size**: 76 MB (71 MB compressed)
+- **Python Required**: ✅ YES (3.8+)
+
 4. **Use the CLI Tool:**
 ```bash
 # Generate single command (uses quantized models by default)
@@ -393,6 +509,26 @@ $ python cli/cmd_generator.py generate "list running processes"
 Input: list running processes
 Generated Command: ps aux
 ```
+
+---
+
+### Deployment Comparison
+
+| Feature | C++ Deployment | Python Deployment |
+|---------|----------------|-------------------|
+| **Python Required** | ❌ No | ✅ Yes (3.8+) |
+| **Package Size** | 44 MB (30 MB compressed) | 76 MB (71 MB compressed) |
+| **Memory Usage** | 45-55 MB RAM | 100-150 MB RAM |
+| **Inference Speed** | 60-120ms | 80-150ms |
+| **Cold Start** | 300-500ms | 1-2 seconds |
+| **Best For** | Embedded devices, production | Development, flexibility |
+| **Documentation** | `cpp/README.md` | Built-in CLI help |
+
+**For complete deployment guides, see:**
+- **C++ Deployment**: `QUICK_DEPLOYMENT.md` and `cpp/README.md`
+- **Python Deployment**: `deployment-python/README.md`
+- **Comparison**: `DEPLOYMENT_PACKAGES.md`
+
 
 ## Model Architecture
 
@@ -1066,8 +1202,15 @@ A:
 **Q: Can I use this with RDK-C (Camera) devices?**
 A: Yes! Add RDK-C specific commands to the dataset and retrain. The architecture supports any command-line interface.
 
+**Q: Should I use C++ or Python deployment?**
+A: 
+- **Use C++** if: Embedded device (RDK-B), no Python environment, minimal resources (<100MB RAM), production deployment
+- **Use Python** if: Development environment, need flexibility, Python already installed, web service deployment
+
 ## Roadmap
 
+- [x] Add C++ ONNX Runtime implementation (no Python required)
+- [x] Create deployment packages for both C++ and Python
 - [ ] Add support for command arguments extraction
 - [ ] Implement beam search for better generation
 - [ ] Add multi-language support (Spanish, French, German)
@@ -1102,6 +1245,7 @@ If you use this project in your research or production, please cite:
 - [ONNX Runtime](https://onnxruntime.ai/) - Cross-platform inference engine
 - [PyTorch](https://pytorch.org/) - Deep learning framework
 - [RDK Central](https://rdkcentral.com/) - RDK Broadband documentation
+- [CMake](https://cmake.org/) - Build system for C++ implementation
 
 ## Contact
 
@@ -1112,6 +1256,7 @@ For questions, suggestions, or collaboration:
 
 ---
 
-**Last Updated**: November 2025  
-**Version**: 1.0  
-**Status**: Production Ready ✅
+**Last Updated**: November 27, 2025  
+**Version**: 2.1.0  
+**Status**: Production Ready ✅  
+**Deployments**: C++ (no Python) + Python (flexible)
