@@ -47,6 +47,12 @@ pip install -r requirements.txt
 
 ```
 seq2sec-cmd-generator/
+├── cpp/                          # C++ ONNX Runtime implementation (no Python)
+│   ├── CMakeLists.txt            # Build configuration
+│   ├── build.sh                  # Automated build script
+│   ├── include/                  # C++ headers
+│   ├── src/                      # C++ source files
+│   └── README.md                 # C++ deployment guide
 ├── data/
 │   ├── commands_dataset.csv      # Training data (CSV format)
 │   └── commands-dataset.json     # Training data (JSON format, 611 samples)

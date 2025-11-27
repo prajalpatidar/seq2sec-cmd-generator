@@ -61,3 +61,24 @@ htmlcov/
 # Temporary files
 /tmp/
 *.tmp
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Build artifacts
+cpp/build/
+onnxruntime/
+
+# Deployment directories (use archives instead)
+deployment-cpp/
+deployment-python/
+
+# Model checkpoints (too large)
+models/checkpoints/*.pth
+models/checkpoints/*.pkl
+
+# ONNX models (use quantized versions)
+models/onnx/encoder.onnx
+models/onnx/decoder.onnx
