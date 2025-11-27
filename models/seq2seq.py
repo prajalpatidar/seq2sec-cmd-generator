@@ -131,15 +131,17 @@ class Seq2SeqModel(nn.Module):
 
         return outputs
 
-    def predict(self, src, max_len=50, start_token=1, end_token=2):
+    def predict(self, src, max_len=50, start_token=1, end_token=2, temperature=1.0, repetition_penalty=1.2):
         """
-        Predict output sequence for given input.
+        Predict output sequence for given input with repetition penalty.
 
         Args:
             src: Source tensor of shape (batch_size, src_seq_len)
             max_len: Maximum length of output sequence
             start_token: Start token index
             end_token: End token index
+            temperature: Sampling temperature (higher = more random)
+            repetition_penalty: Penalty for repeating tokens (>1.0 reduces repetition)
         Returns:
             predictions: List of predicted token indices
         """
@@ -154,16 +156,32 @@ class Seq2SeqModel(nn.Module):
             decoder_input = torch.tensor([[start_token]] * batch_size).to(src.device)
 
             predictions = []
+            prev_tokens = set()
 
             for _ in range(max_len):
                 output, hidden = self.decoder(decoder_input, hidden, encoder_outputs)
+                
+                # Apply repetition penalty
+                if repetition_penalty != 1.0 and len(prev_tokens) > 0:
+                    for prev_token in prev_tokens:
+                        if prev_token < output.size(1):
+                            output[0, prev_token] = output[0, prev_token] / repetition_penalty
+                
+                # Apply temperature
+                if temperature != 1.0:
+                    output = output / temperature
+                
+                # Get top prediction
                 top1 = output.argmax(1)
-                predictions.append(top1.item() if batch_size == 1 else top1)
-
+                token_id = top1.item() if batch_size == 1 else top1[0].item()
+                
                 # Stop if <END> token is predicted
-                if batch_size == 1 and top1.item() == end_token:
+                if batch_size == 1 and token_id == end_token:
                     break
-
+                
+                predictions.append(token_id if batch_size == 1 else top1)
+                prev_tokens.add(token_id)
+                
                 decoder_input = top1.unsqueeze(1)
 
             return predictions

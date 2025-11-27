@@ -41,13 +41,14 @@ class CommandGenerator:
 
         print("Models loaded successfully!")
 
-    def generate(self, input_text, max_len=50):
+    def generate(self, input_text, max_len=50, repetition_penalty=1.2):
         """
         Generate Linux command from natural language input.
 
         Args:
             input_text: Natural language instruction
             max_len: Maximum length of generated command
+            repetition_penalty: Penalty for repeating tokens (>1.0 reduces repetition)
         Returns:
             Generated Linux command
         """
@@ -64,11 +65,18 @@ class CommandGenerator:
 
         decoder_input = np.array([[start_token]], dtype=np.int64)
         predictions = []
+        prev_tokens = set()
 
         for _ in range(max_len):
             output, hidden = self.decoder_session.run(
                 None, {"input": decoder_input, "hidden": hidden, "encoder_outputs": encoder_outputs}
             )
+
+            # Apply repetition penalty
+            if repetition_penalty != 1.0 and len(prev_tokens) > 0:
+                for prev_token in prev_tokens:
+                    if prev_token < output.shape[1]:
+                        output[0, prev_token] = output[0, prev_token] / repetition_penalty
 
             # Get predicted token
             predicted_token = np.argmax(output, axis=1)[0]
@@ -78,6 +86,7 @@ class CommandGenerator:
                 break
 
             predictions.append(predicted_token)
+            prev_tokens.add(int(predicted_token))
             decoder_input = np.array([[predicted_token]], dtype=np.int64)
 
         # Decode predictions
@@ -94,7 +103,8 @@ def cli():
 @cli.command()
 @click.argument("input_text")
 @click.option("--quantized", is_flag=True, help="Use quantized models for embedded deployment")
-def generate(input_text, quantized):
+@click.option("--repetition-penalty", default=1.5, type=float, help="Penalty for repeating tokens (>1.0 reduces repetition)")
+def generate(input_text, quantized, repetition_penalty):
     """
     Generate Linux command from natural language instruction.
 
@@ -131,7 +141,7 @@ def generate(input_text, quantized):
 
     # Generate command
     click.echo(f"\nInput: {input_text}")
-    command = generator.generate(input_text)
+    command = generator.generate(input_text, repetition_penalty=repetition_penalty)
     click.echo(f"Generated Command: {command}")
 
 

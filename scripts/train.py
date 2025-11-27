@@ -24,12 +24,20 @@ def load_data(data_path: str, train_split: float = 0.8):
     Load and split dataset.
 
     Args:
-        data_path: Path to CSV file
+        data_path: Path to CSV or JSON file
         train_split: Fraction of data to use for training
     Returns:
         Tuple of (train_inputs, train_outputs, val_inputs, val_outputs)
     """
-    df = pd.read_csv(data_path)
+    import json
+    
+    # Check file extension and load accordingly
+    if data_path.endswith('.json'):
+        with open(data_path, 'r') as f:
+            data = json.load(f)
+        df = pd.DataFrame(data)
+    else:
+        df = pd.read_csv(data_path)
 
     # Shuffle data
     df = df.sample(frac=1, random_state=42).reset_index(drop=True)
@@ -135,7 +143,7 @@ def main():
     print(f"Using device: {device}")
 
     # Load data
-    data_path = os.path.join(os.path.dirname(__file__), "..", "data", "commands_dataset.csv")
+    data_path = os.path.join(os.path.dirname(__file__), "..", "data", "commands-dataset.json")
     train_inputs, train_outputs, val_inputs, val_outputs = load_data(
         data_path, config["train_split"]
     )
@@ -198,6 +206,8 @@ def main():
 
     # Training loop
     best_val_loss = float("inf")
+    patience = 30  # Early stopping patience - increased for more training
+    patience_counter = 0
 
     for epoch in range(config["num_epochs"]):
         print(f"\nEpoch {epoch + 1}/{config['num_epochs']}")
@@ -216,13 +226,32 @@ def main():
         # Save best model
         if val_loss < best_val_loss:
             best_val_loss = val_loss
+            patience_counter = 0
+            checkpoint_path = os.path.join(
+                os.path.dirname(__file__), "..", "models", "checkpoints", "best_model.pth"
+            )
             torch.save(
-                model.state_dict(),
-                os.path.join(
-                    os.path.dirname(__file__), "..", "models", "checkpoints", "best_model.pth"
-                ),
+                {
+                    'model_state_dict': model.state_dict(),
+                    'input_vocab_size': len(input_tokenizer),
+                    'output_vocab_size': len(output_tokenizer),
+                    'config': {
+                        'embedding_dim': config["embedding_dim"],
+                        'hidden_dim': config["hidden_dim"],
+                        'num_layers': config["num_layers"]
+                    }
+                },
+                checkpoint_path
             )
             print("Saved best model!")
+        else:
+            patience_counter += 1
+            print(f"No improvement for {patience_counter} epoch(s)")
+            
+            # Early stopping
+            if patience_counter >= patience:
+                print(f"\nEarly stopping triggered after {epoch + 1} epochs")
+                break
 
     print("\nTraining completed!")
     print(f"Best validation loss: {best_val_loss:.4f}")

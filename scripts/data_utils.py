@@ -118,7 +118,62 @@ class Tokenizer:
         if self.level == "char":
             return "".join(tokens)
         else:
-            return " ".join(tokens)
+            result = " ".join(tokens)
+            # Post-process dmcli commands to remove spaces around dots
+            result = self._post_process_dmcli(result)
+            return result
+    
+    def _post_process_dmcli(self, text: str) -> str:
+        """
+        Post-process dmcli commands to fix formatting.
+        Removes spaces around dots in device paths and fixes case.
+        
+        Args:
+            text: Decoded text
+        Returns:
+            Post-processed text
+        """
+        # If it's a dmcli command, fix formatting
+        if 'dmcli' in text.lower():
+            # Simple approach: fix common patterns
+            # Remove spaces around dots
+            text = re.sub(r'\s*\.\s*', '.', text)
+            # Remove spaces around commas
+            text = re.sub(r'\s*,\s*', ',', text)
+            # Fix hyphenated words
+            text = re.sub(r'\s+-\s+', '-', text)
+            
+            # Fix case: capitalize Device path components
+            # Pattern: device.something.something -> Device.Something.Something
+            def capitalize_device_path(match):
+                path = match.group(0)
+                components = path.split('.')
+                result = []
+                for comp in components:
+                    if comp.lower() == 'device':
+                        result.append('Device')
+                    elif comp.startswith('x_') or comp.startswith('X_'):
+                        # Handle X_ prefixes
+                        parts = comp.split('_', 1)
+                        if len(parts) == 2:
+                            result.append('X_' + '_'.join([p.upper() if p.isupper() or p.lower() in ['com', 'cisco', 'comcast', 'rdkcentral'] else p.capitalize() for p in parts[1].split('_')]))
+                        else:
+                            result.append(comp)
+                    elif '_' in comp:
+                        # Capitalize each part separated by underscore
+                        result.append('_'.join([p.capitalize() if not p.isupper() else p for p in comp.split('_')]))
+                    else:
+                        result.append(comp.capitalize())
+                return '.'.join(result)
+            
+            # Find and capitalize device paths
+            text = re.sub(r'device\.[a-z0-9._]+', capitalize_device_path, text, flags=re.IGNORECASE)
+            
+            # Fix dmcli eRT case
+            text = re.sub(r'\bdmcli\s+ert\b', 'dmcli eRT', text, flags=re.IGNORECASE)
+            text = re.sub(r'\bdmcli\s+erat\b', 'dmcli eRT', text, flags=re.IGNORECASE)
+            
+        return text
 
     def save(self, filepath: str):
         """Save tokenizer to file."""

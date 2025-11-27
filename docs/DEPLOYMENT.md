@@ -1,13 +1,14 @@
 # Embedded Systems Deployment Guide
 
-This guide provides detailed instructions for deploying the seq2sec-cmd-generator on embedded systems with limited resources.
+This guide provides detailed instructions for deploying the seq2sec-cmd-generator on RDK-B embedded systems and other resource-constrained devices.
 
 ## Target Environment
 
-- **CPU**: Intel Atom dual-core or similar
-- **RAM**: 500MB available
-- **Storage**: 50MB minimum
-- **OS**: Linux-based (Ubuntu, Debian, Yocto, etc.)
+- **Platform**: RDK-B Devices / Embedded Linux Systems
+- **CPU**: Intel Atom dual-core or ARM Cortex-A series
+- **RAM**: 500MB - 1GB available
+- **Storage**: 100MB minimum (for models + runtime)
+- **OS**: Linux-based (Ubuntu, Debian, Yocto, RDK-B Linux)
 
 ## Deployment Steps
 
@@ -27,12 +28,22 @@ python scripts/export_onnx.py
 ```
 
 This creates the following files:
-- `models/onnx/encoder_quantized.onnx` (~250KB)
-- `models/onnx/decoder_quantized.onnx` (~250KB)
-- `models/checkpoints/input_tokenizer.pkl` (~50KB)
-- `models/checkpoints/output_tokenizer.pkl` (~50KB)
 
-**Total size: ~600KB**
+**Standard ONNX Models (FP32):**
+- `models/onnx/encoder.onnx` (10.85 MB)
+- `models/onnx/decoder.onnx` (14.74 MB)
+- Total: 25.59 MB
+
+**Quantized ONNX Models (INT8):**
+- `models/onnx/encoder_quantized.onnx` (10.61 MB)
+- `models/onnx/decoder_quantized.onnx` (13.84 MB)
+- Total: 24.45 MB
+
+**Tokenizers:**
+- `models/checkpoints/input_tokenizer.pkl` (~150KB, vocab=326)
+- `models/checkpoints/output_tokenizer.pkl` (~200KB, vocab=412)
+
+**Total Deployment Package: ~25-26 MB** (quantized recommended)
 
 ### 2. Prepare Embedded System
 
@@ -110,10 +121,20 @@ mv data_utils.py scripts/
 ### 6. Test the Deployment
 
 ```bash
-# Test command generation
-python cmd_generator.py generate "show network interfaces" --quantized
+# Test Linux command generation
+python cmd_generator.py generate "show network interfaces"
+# Expected: ifconfig
 
-# Should output: ifconfig
+# Test RDKB dmcli command generation
+python cmd_generator.py generate "show wifi ssid"
+# Expected: dmcli eRT getv Device.WiFi.SSID.1.SSID
+
+python cmd_generator.py generate "get device model name"
+# Expected: dmcli eRT getv Device.DeviceInfo.ModelName
+
+# Test with quantized models (default for production)
+python cmd_generator.py generate "list all files" --quantized
+# Expected: ls -la
 ```
 
 ### 7. Create System Service (Optional)
@@ -226,25 +247,44 @@ python benchmark.py
 ```
 
 Expected performance:
-- **Intel Atom**: 20-50ms per command
-- **Raspberry Pi 4**: 30-80ms per command
-- **ARM Cortex-A9**: 50-150ms per command
+- **Intel Atom**: 40-80ms per command (quantized INT8)
+- **Raspberry Pi 4**: 50-100ms per command
+- **ARM Cortex-A series**: 80-150ms per command
+- **RDK-B Devices**: 60-120ms per command
+
+**Model Specifications:**
+- Parameters: 6,705,053 (6.7M)
+- Architecture: 2-layer GRU encoder-decoder with attention
+- Embedding dimension: 256
+- Hidden dimension: 512
+- Vocabulary: Input=326, Output=412
+- Dataset: 611 samples (519 train, 92 validation)
 
 ## Troubleshooting
 
 ### Issue: Out of Memory
 
 **Solution**: 
-- Reduce model size by decreasing `hidden_dim` in config
-- Use smaller vocabulary size
+- Use INT8 quantized models (saves ~4.5% memory)
+- Process one command at a time (no batching)
 - Close other applications
+- For extreme constraints, consider:
+  - Reducing vocabulary size (edit tokenizer max_vocab_size)
+  - Using single-layer model (retrain with num_layers: 1)
+  - Reducing hidden_dim to 256 (retrain required)
 
 ### Issue: Slow Inference
 
 **Solution**:
-- Ensure you're using quantized models
-- Check CPU frequency scaling settings
-- Consider using int8 quantization
+- Ensure you're using INT8 quantized models (default)
+- Check CPU frequency scaling: `cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor`
+- Enable performance mode: `sudo cpupower frequency-set -g performance`
+- Use ONNX Runtime execution providers:
+  ```python
+  providers = ['CPUExecutionProvider']
+  session = ort.InferenceSession(model, providers=providers)
+  ```
+- For Intel devices, consider OpenVINO execution provider
 
 ### Issue: Import Errors
 
@@ -271,16 +311,59 @@ pip install --force-reinstall onnxruntime numpy
 
 ```python
 from flask import Flask, request, jsonify
-from cmd_generator import CommandGenerator
+import onnxruntime as ort
+import pickle
+import numpy as np
+from scripts.data_utils import Tokenizer
 
 app = Flask(__name__)
-generator = CommandGenerator(...)
+
+# Load models once at startup
+with open('models/checkpoints/input_tokenizer.pkl', 'rb') as f:
+    input_tokenizer = pickle.load(f)
+with open('models/checkpoints/output_tokenizer.pkl', 'rb') as f:
+    output_tokenizer = pickle.load(f)
+
+encoder_session = ort.InferenceSession('models/onnx/encoder_quantized.onnx')
+decoder_session = ort.InferenceSession('models/onnx/decoder_quantized.onnx')
 
 @app.route('/generate', methods=['POST'])
 def generate():
     data = request.json
-    command = generator.generate(data['input'])
-    return jsonify({'command': command})
+    text = data.get('input', '')
+    
+    # Tokenize and generate
+    tokens = input_tokenizer.encode(text)
+    input_tensor = np.array([tokens], dtype=np.int64)
+    
+    # Run encoder
+    encoder_outputs, hidden = encoder_session.run(None, {'input': input_tensor})
+    
+    # Run decoder (simplified)
+    output_tokens = []
+    decoder_input = np.array([[output_tokenizer.token2id['<START>']]], dtype=np.int64)
+    
+    for _ in range(50):
+        output, hidden, attn = decoder_session.run(
+            None,
+            {
+                'input': decoder_input,
+                'hidden': hidden,
+                'encoder_outputs': encoder_outputs
+            }
+        )
+        next_token = np.argmax(output[0, -1, :])
+        if next_token == output_tokenizer.token2id['<END>']:
+            break
+        output_tokens.append(next_token)
+        decoder_input = np.array([[next_token]], dtype=np.int64)
+    
+    command = output_tokenizer.decode(output_tokens)
+    return jsonify({'command': command, 'input': text})
+
+@app.route('/health', methods=['GET'])
+def health():
+    return jsonify({'status': 'healthy', 'model': 'seq2seq-2layer-gru'})
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
@@ -289,13 +372,31 @@ if __name__ == '__main__':
 ### Shell Integration
 
 ```bash
-# Add to .bashrc
+# Add to .bashrc or .profile
 cmdgen() {
-    python /path/to/cmd_generator.py generate "$*" --quantized
+    python /opt/cmd-generator/cmd_generator.py generate "$*"
 }
 
-# Usage
+# Advanced: Execute generated command directly
+nlcmd() {
+    local cmd=$(python /opt/cmd-generator/cmd_generator.py generate "$*" 2>/dev/null | grep -E '^(ifconfig|ls|ps|df|dmcli|cat|grep|find|iptables)' | head -1)
+    if [ -n "$cmd" ]; then
+        echo "Executing: $cmd"
+        eval "$cmd"
+    else
+        echo "Could not generate command for: $*"
+    fi
+}
+
+# Usage examples
 cmdgen show network interfaces
+# Output: ifconfig
+
+nlcmd show wifi ssid
+# Executes: dmcli eRT getv Device.WiFi.SSID.1.SSID
+
+nlcmd list all files
+# Executes: ls -la
 ```
 
 ## Security Considerations

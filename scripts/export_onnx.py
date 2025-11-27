@@ -59,7 +59,7 @@ class DecoderWrapper(torch.nn.Module):
         return output, hidden
 
 
-def export_to_onnx(model, input_tokenizer, output_tokenizer, output_dir):
+def export_to_onnx(model, input_tokenizer, output_tokenizer, output_dir, num_layers=1):
     """
     Export model to ONNX format.
 
@@ -68,6 +68,7 @@ def export_to_onnx(model, input_tokenizer, output_tokenizer, output_dir):
         input_tokenizer: Input tokenizer
         output_tokenizer: Output tokenizer
         output_dir: Directory to save ONNX models
+        num_layers: Number of GRU layers
     """
     model.eval()
 
@@ -91,13 +92,15 @@ def export_to_onnx(model, input_tokenizer, output_tokenizer, output_dir):
             "hidden": {1: "batch_size"},
         },
         opset_version=13,
+        dynamo=False,  # Use legacy exporter
     )
     print(f"Encoder exported to {encoder_path}")
 
     # Export decoder
     decoder_wrapper = DecoderWrapper(model.decoder)
     dummy_decoder_input = torch.randint(0, len(output_tokenizer), (1, 1))
-    dummy_hidden = torch.randn(1, 1, model.hidden_dim)
+    # Fix: hidden shape should be (num_layers, batch_size, hidden_dim)
+    dummy_hidden = torch.randn(num_layers, 1, model.hidden_dim)
     dummy_encoder_outputs = torch.randn(1, 10, model.hidden_dim)
 
     decoder_path = os.path.join(output_dir, "decoder.onnx")
@@ -115,6 +118,7 @@ def export_to_onnx(model, input_tokenizer, output_tokenizer, output_dir):
             "new_hidden": {1: "batch_size"},
         },
         opset_version=13,
+        dynamo=False,  # Use legacy exporter
     )
     print(f"Decoder exported to {decoder_path}")
 
@@ -178,12 +182,26 @@ def main():
     model_path = os.path.join(
         os.path.dirname(__file__), "..", "models", "checkpoints", "best_model.pth"
     )
-    model.load_state_dict(torch.load(model_path, map_location="cpu"))
-    print(f"Model loaded from {model_path}")
+    
+    # Load checkpoint (handle new format with metadata)
+    checkpoint = torch.load(model_path, map_location="cpu", weights_only=False)
+    if isinstance(checkpoint, dict) and 'model_state_dict' in checkpoint:
+        model.load_state_dict(checkpoint['model_state_dict'])
+        # Get num_layers from checkpoint config if available
+        if 'config' in checkpoint:
+            num_layers = checkpoint['config'].get('num_layers', config['num_layers'])
+        else:
+            num_layers = config['num_layers']
+        print(f"Model loaded from {model_path} (new format with config)")
+    else:
+        model.load_state_dict(checkpoint)
+        num_layers = config['num_layers']
+        print(f"Model loaded from {model_path} (legacy format)")
+
 
     # Export to ONNX
     output_dir = os.path.join(os.path.dirname(__file__), "..", "models", "onnx")
-    export_to_onnx(model, input_tokenizer, output_tokenizer, output_dir)
+    export_to_onnx(model, input_tokenizer, output_tokenizer, output_dir, num_layers=num_layers)
 
     # Quantize models for embedded deployment
     print("\nQuantizing models for embedded deployment...")

@@ -117,8 +117,7 @@
   },
   {
     "input": "search for big files",
-    "output": "find . -type f -size +50M -exec ls -lh {} \
-  ;"
+    "output": "find . -type f -size +50M -exec ls -lh {} \\;"
   },
   {
     "input": "show system information",
@@ -379,5 +378,2069 @@
   {
     "input": "show temperature sensors",
     "output": "sensors"
+  },
+  {
+    "input": "add static ip route",
+    "output": "ip route add 192.168.1.0/24 via 10.0.0.1"
+  },
+  {
+    "input": "delete specific route",
+    "output": "ip route del 192.168.1.0/24"
+  },
+  {
+    "input": "add default gateway",
+    "output": "ip route add default via 192.168.1.1"
+  },
+  {
+    "input": "show kernel routing table",
+    "output": "route -n"
+  },
+  {
+    "input": "display routing cache",
+    "output": "ip route show cache"
+  },
+  {
+    "input": "show routing table for specific interface",
+    "output": "ip route show dev eth0"
+  },
+  {
+    "input": "flush routing cache",
+    "output": "ip route flush cache"
+  },
+  {
+    "input": "show ipv6 routes",
+    "output": "ip -6 route show"
+  },
+  {
+    "input": "add ipv6 route",
+    "output": "ip -6 route add 2001:db8::/32 via 2001:db8::1"
+  },
+  {
+    "input": "show route to specific destination",
+    "output": "ip route get 8.8.8.8"
+  },
+  {
+    "input": "list all iptables rules",
+    "output": "iptables -L -v -n"
+  },
+  {
+    "input": "show iptables nat rules",
+    "output": "iptables -t nat -L -v -n"
+  },
+  {
+    "input": "show iptables mangle rules",
+    "output": "iptables -t mangle -L -v -n"
+  },
+  {
+    "input": "display iptables filter rules",
+    "output": "iptables -t filter -L -v -n"
+  },
+  {
+    "input": "show iptables rules with line numbers",
+    "output": "iptables -L -v -n --line-numbers"
+  },
+  {
+    "input": "allow incoming ssh connections",
+    "output": "iptables -A INPUT -p tcp --dport 22 -j ACCEPT"
+  },
+  {
+    "input": "allow incoming http traffic",
+    "output": "iptables -A INPUT -p tcp --dport 80 -j ACCEPT"
+  },
+  {
+    "input": "allow incoming https traffic",
+    "output": "iptables -A INPUT -p tcp --dport 443 -j ACCEPT"
+  },
+  {
+    "input": "block specific ip address",
+    "output": "iptables -A INPUT -s 192.168.1.100 -j DROP"
+  },
+  {
+    "input": "allow traffic from specific ip",
+    "output": "iptables -A INPUT -s 192.168.1.0/24 -j ACCEPT"
+  },
+  {
+    "input": "drop all incoming traffic",
+    "output": "iptables -P INPUT DROP"
+  },
+  {
+    "input": "accept all outgoing traffic",
+    "output": "iptables -P OUTPUT ACCEPT"
+  },
+  {
+    "input": "delete iptables rule by number",
+    "output": "iptables -D INPUT 3"
+  },
+  {
+    "input": "flush all iptables rules",
+    "output": "iptables -F"
+  },
+  {
+    "input": "delete specific chain",
+    "output": "iptables -X CHAIN_NAME"
+  },
+  {
+    "input": "save iptables rules",
+    "output": "iptables-save > /etc/iptables/rules.v4"
+  },
+  {
+    "input": "restore iptables rules",
+    "output": "iptables-restore < /etc/iptables/rules.v4"
+  },
+  {
+    "input": "enable port forwarding",
+    "output": "iptables -t nat -A PREROUTING -p tcp --dport 80 -j REDIRECT --to-port 8080"
+  },
+  {
+    "input": "setup nat masquerading",
+    "output": "iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE"
+  },
+  {
+    "input": "allow established connections",
+    "output": "iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT"
+  },
+  {
+    "input": "limit connection rate",
+    "output": "iptables -A INPUT -p tcp --dport 22 -m limit --limit 3/min -j ACCEPT"
+  },
+  {
+    "input": "block ping requests",
+    "output": "iptables -A INPUT -p icmp --icmp-type echo-request -j DROP"
+  },
+  {
+    "input": "show memory information",
+    "output": "cat /proc/meminfo"
+  },
+  {
+    "input": "display available memory",
+    "output": "free -h"
+  },
+  {
+    "input": "show memory in megabytes",
+    "output": "free -m"
+  },
+  {
+    "input": "check swap usage",
+    "output": "free -h | grep Swap"
+  },
+  {
+    "input": "display detailed memory stats",
+    "output": "vmstat -s"
+  },
+  {
+    "input": "show memory usage continuously",
+    "output": "vmstat 1"
+  },
+  {
+    "input": "display memory by process",
+    "output": "ps aux --sort=-%mem | head"
+  },
+  {
+    "input": "show top memory consuming processes",
+    "output": "ps -eo pid,ppid,cmd,%mem,%cpu --sort=-%mem | head"
+  },
+  {
+    "input": "check slab memory info",
+    "output": "cat /proc/slabinfo"
+  },
+  {
+    "input": "display buffer and cache usage",
+    "output": "cat /proc/meminfo | grep -E 'Buffers|Cached'"
+  },
+  {
+    "input": "show committed memory",
+    "output": "cat /proc/meminfo | grep Committed"
+  },
+  {
+    "input": "clear page cache",
+    "output": "sync && echo 1 > /proc/sys/vm/drop_caches"
+  },
+  {
+    "input": "clear dentries and inodes",
+    "output": "sync && echo 2 > /proc/sys/vm/drop_caches"
+  },
+  {
+    "input": "clear all caches",
+    "output": "sync && echo 3 > /proc/sys/vm/drop_caches"
+  },
+  {
+    "input": "show per process memory map",
+    "output": "pmap -x PID"
+  },
+  {
+    "input": "display shared memory segments",
+    "output": "ipcs -m"
+  },
+  {
+    "input": "show network interface statistics",
+    "output": "netstat -i"
+  },
+  {
+    "input": "display network connections",
+    "output": "netstat -tunlp"
+  },
+  {
+    "input": "show tcp connections",
+    "output": "netstat -tn"
+  },
+  {
+    "input": "show udp connections",
+    "output": "netstat -un"
+  },
+  {
+    "input": "display listening tcp ports",
+    "output": "netstat -tln"
+  },
+  {
+    "input": "display listening udp ports",
+    "output": "netstat -uln"
+  },
+  {
+    "input": "show network statistics",
+    "output": "netstat -s"
+  },
+  {
+    "input": "display tcp statistics",
+    "output": "netstat -st"
+  },
+  {
+    "input": "show udp statistics",
+    "output": "netstat -su"
+  },
+  {
+    "input": "list all sockets",
+    "output": "ss -a"
+  },
+  {
+    "input": "show established connections",
+    "output": "ss -o state established"
+  },
+  {
+    "input": "display socket memory usage",
+    "output": "ss -m"
+  },
+  {
+    "input": "show sockets with process info",
+    "output": "ss -p"
+  },
+  {
+    "input": "display detailed socket info",
+    "output": "ss -e"
+  },
+  {
+    "input": "bring network interface up",
+    "output": "ip link set eth0 up"
+  },
+  {
+    "input": "bring network interface down",
+    "output": "ip link set eth0 down"
+  },
+  {
+    "input": "set interface mtu",
+    "output": "ip link set eth0 mtu 1500"
+  },
+  {
+    "input": "add ip address to interface",
+    "output": "ip addr add 192.168.1.100/24 dev eth0"
+  },
+  {
+    "input": "delete ip address from interface",
+    "output": "ip addr del 192.168.1.100/24 dev eth0"
+  },
+  {
+    "input": "show interface configuration",
+    "output": "ip addr show eth0"
+  },
+  {
+    "input": "display arp cache",
+    "output": "ip neigh show"
+  },
+  {
+    "input": "add static arp entry",
+    "output": "ip neigh add 192.168.1.1 lladdr 00:11:22:33:44:55 dev eth0"
+  },
+  {
+    "input": "delete arp entry",
+    "output": "ip neigh del 192.168.1.1 dev eth0"
+  },
+  {
+    "input": "flush arp cache",
+    "output": "ip neigh flush all"
+  },
+  {
+    "input": "show network namespaces",
+    "output": "ip netns list"
+  },
+  {
+    "input": "create network namespace",
+    "output": "ip netns add test_ns"
+  },
+  {
+    "input": "delete network namespace",
+    "output": "ip netns del test_ns"
+  },
+  {
+    "input": "execute command in namespace",
+    "output": "ip netns exec test_ns command"
+  },
+  {
+    "input": "show vlan interfaces",
+    "output": "ip -d link show"
+  },
+  {
+    "input": "create vlan interface",
+    "output": "ip link add link eth0 name eth0.100 type vlan id 100"
+  },
+  {
+    "input": "delete vlan interface",
+    "output": "ip link del eth0.100"
+  },
+  {
+    "input": "show bridge interfaces",
+    "output": "brctl show"
+  },
+  {
+    "input": "create bridge interface",
+    "output": "ip link add br0 type bridge"
+  },
+  {
+    "input": "add interface to bridge",
+    "output": "ip link set eth0 master br0"
+  },
+  {
+    "input": "remove interface from bridge",
+    "output": "ip link set eth0 nomaster"
+  },
+  {
+    "input": "show bridge forwarding table",
+    "output": "bridge fdb show"
+  },
+  {
+    "input": "display network bandwidth usage",
+    "output": "iftop"
+  },
+  {
+    "input": "monitor network traffic",
+    "output": "iptraf-ng"
+  },
+  {
+    "input": "capture network packets",
+    "output": "tcpdump -i eth0"
+  },
+  {
+    "input": "capture packets to file",
+    "output": "tcpdump -i eth0 -w capture.pcap"
+  },
+  {
+    "input": "read packet capture file",
+    "output": "tcpdump -r capture.pcap"
+  },
+  {
+    "input": "capture specific port traffic",
+    "output": "tcpdump -i eth0 port 80"
+  },
+  {
+    "input": "capture traffic from specific host",
+    "output": "tcpdump -i eth0 host 192.168.1.100"
+  },
+  {
+    "input": "show active network connections",
+    "output": "lsof -i"
+  },
+  {
+    "input": "list connections on specific port",
+    "output": "lsof -i :80"
+  },
+  {
+    "input": "show connections by process",
+    "output": "lsof -i -a -p PID"
+  },
+  {
+    "input": "display ipv6 neighbors",
+    "output": "ip -6 neigh show"
+  },
+  {
+    "input": "show ipv6 addresses",
+    "output": "ip -6 addr show"
+  },
+  {
+    "input": "test network connectivity to host",
+    "output": "ping -c 4 8.8.8.8"
+  },
+  {
+    "input": "ping with specific packet size",
+    "output": "ping -s 1000 8.8.8.8"
+  },
+  {
+    "input": "continuous ping",
+    "output": "ping 8.8.8.8"
+  },
+  {
+    "input": "traceroute to host",
+    "output": "traceroute google.com"
+  },
+  {
+    "input": "traceroute using icmp",
+    "output": "traceroute -I google.com"
+  },
+  {
+    "input": "mtr network diagnostic",
+    "output": "mtr google.com"
+  },
+  {
+    "input": "show network link speed",
+    "output": "ethtool eth0"
+  },
+  {
+    "input": "display interface statistics",
+    "output": "ethtool -S eth0"
+  },
+  {
+    "input": "set interface speed",
+    "output": "ethtool -s eth0 speed 1000 duplex full"
+  },
+  {
+    "input": "show tcp connection states",
+    "output": "ss -tan state time-wait"
+  },
+  {
+    "input": "count connections per state",
+    "output": "ss -tan | awk '{print $1}' | sort | uniq -c"
+  },
+  {
+    "input": "show connection queue sizes",
+    "output": "ss -tln"
+  },
+  {
+    "input": "display network interfaces",
+    "output": "ifconfig"
+  },
+  {
+    "input": "list network interfaces",
+    "output": "ifconfig"
+  },
+  {
+    "input": "view network interfaces",
+    "output": "ifconfig"
+  },
+  {
+    "input": "show all network interfaces",
+    "output": "ip link show"
+  },
+  {
+    "input": "display all network interfaces",
+    "output": "ip link show"
+  },
+  {
+    "input": "enumerate all network interfaces",
+    "output": "ip link show"
+  },
+  {
+    "input": "show ip address",
+    "output": "ip addr show"
+  },
+  {
+    "input": "list ip address",
+    "output": "ip addr show"
+  },
+  {
+    "input": "view ip address",
+    "output": "ip addr show"
+  },
+  {
+    "input": "display network configuration",
+    "output": "ip a"
+  },
+  {
+    "input": "list network configuration",
+    "output": "ip a"
+  },
+  {
+    "input": "view network configuration",
+    "output": "ip a"
+  },
+  {
+    "input": "show listening ports",
+    "output": "netstat -tuln"
+  },
+  {
+    "input": "display listening ports",
+    "output": "netstat -tuln"
+  },
+  {
+    "input": "verify listening ports",
+    "output": "netstat -tuln"
+  },
+  {
+    "input": "display active network connections",
+    "output": "ss -tuln"
+  },
+  {
+    "input": "list active network connections",
+    "output": "ss -tuln"
+  },
+  {
+    "input": "view active network connections",
+    "output": "ss -tuln"
+  },
+  {
+    "input": "show routing table",
+    "output": "route -n"
+  },
+  {
+    "input": "list routing table",
+    "output": "route -n"
+  },
+  {
+    "input": "view routing table",
+    "output": "route -n"
+  },
+  {
+    "input": "display ip routing",
+    "output": "ip route show"
+  },
+  {
+    "input": "list ip routing",
+    "output": "ip route show"
+  },
+  {
+    "input": "view ip routing",
+    "output": "ip route show"
+  },
+  {
+    "input": "show running processes",
+    "output": "ps aux"
+  },
+  {
+    "input": "display running processes",
+    "output": "ps aux"
+  },
+  {
+    "input": "enumerate running processes",
+    "output": "ps aux"
+  },
+  {
+    "input": "display all processes",
+    "output": "ps -ef"
+  },
+  {
+    "input": "list all processes",
+    "output": "ps -ef"
+  },
+  {
+    "input": "view all processes",
+    "output": "ps -ef"
+  },
+  {
+    "input": "show process tree",
+    "output": "pstree"
+  },
+  {
+    "input": "list process tree",
+    "output": "pstree"
+  },
+  {
+    "input": "view process tree",
+    "output": "pstree"
+  },
+  {
+    "input": "display top processes by cpu",
+    "output": "top"
+  },
+  {
+    "input": "list top processes by cpu",
+    "output": "top"
+  },
+  {
+    "input": "view top processes by cpu",
+    "output": "top"
+  },
+  {
+    "input": "search process by name",
+    "output": "pgrep process_name"
+  },
+  {
+    "input": "locate process by name",
+    "output": "pgrep process_name"
+  },
+  {
+    "input": "get process by name",
+    "output": "pgrep process_name"
+  },
+  {
+    "input": "display process information",
+    "output": "ps -p PID -o pid,ppid,cmd,%mem,%cpu"
+  },
+  {
+    "input": "list process information",
+    "output": "ps -p PID -o pid,ppid,cmd,%mem,%cpu"
+  },
+  {
+    "input": "view process information",
+    "output": "ps -p PID -o pid,ppid,cmd,%mem,%cpu"
+  },
+  {
+    "input": "show background jobs",
+    "output": "jobs"
+  },
+  {
+    "input": "display background jobs",
+    "output": "jobs"
+  },
+  {
+    "input": "enumerate background jobs",
+    "output": "jobs"
+  },
+  {
+    "input": "show disk usage",
+    "output": "df -h"
+  },
+  {
+    "input": "display disk usage",
+    "output": "df -h"
+  },
+  {
+    "input": "verify disk usage",
+    "output": "df -h"
+  },
+  {
+    "input": "display disk space",
+    "output": "df -h"
+  },
+  {
+    "input": "list disk space",
+    "output": "df -h"
+  },
+  {
+    "input": "view disk space",
+    "output": "df -h"
+  },
+  {
+    "input": "show directory size",
+    "output": "du -sh *"
+  },
+  {
+    "input": "list directory size",
+    "output": "du -sh *"
+  },
+  {
+    "input": "view directory size",
+    "output": "du -sh *"
+  },
+  {
+    "input": "show folder size",
+    "output": "du -h --max-depth=1"
+  },
+  {
+    "input": "display folder size",
+    "output": "du -h --max-depth=1"
+  },
+  {
+    "input": "verify folder size",
+    "output": "du -h --max-depth=1"
+  },
+  {
+    "input": "show mounted filesystems",
+    "output": "mount | column -t"
+  },
+  {
+    "input": "display mounted filesystems",
+    "output": "mount | column -t"
+  },
+  {
+    "input": "enumerate mounted filesystems",
+    "output": "mount | column -t"
+  },
+  {
+    "input": "display block devices",
+    "output": "lsblk"
+  },
+  {
+    "input": "list block devices",
+    "output": "lsblk"
+  },
+  {
+    "input": "view block devices",
+    "output": "lsblk"
+  },
+  {
+    "input": "show disk partitions",
+    "output": "fdisk -l"
+  },
+  {
+    "input": "display disk partitions",
+    "output": "fdisk -l"
+  },
+  {
+    "input": "verify disk partitions",
+    "output": "fdisk -l"
+  },
+  {
+    "input": "show inode usage",
+    "output": "df -i"
+  },
+  {
+    "input": "list inode usage",
+    "output": "df -i"
+  },
+  {
+    "input": "view inode usage",
+    "output": "df -i"
+  },
+  {
+    "input": "search large files",
+    "output": "find / -type f -size +100M"
+  },
+  {
+    "input": "locate large files",
+    "output": "find / -type f -size +100M"
+  },
+  {
+    "input": "get large files",
+    "output": "find / -type f -size +100M"
+  },
+  {
+    "input": "display system information",
+    "output": "uname -a"
+  },
+  {
+    "input": "list system information",
+    "output": "uname -a"
+  },
+  {
+    "input": "view system information",
+    "output": "uname -a"
+  },
+  {
+    "input": "show kernel version",
+    "output": "uname -r"
+  },
+  {
+    "input": "list kernel version",
+    "output": "uname -r"
+  },
+  {
+    "input": "view kernel version",
+    "output": "uname -r"
+  },
+  {
+    "input": "show os version",
+    "output": "cat /etc/os-release"
+  },
+  {
+    "input": "display os version",
+    "output": "cat /etc/os-release"
+  },
+  {
+    "input": "verify os version",
+    "output": "cat /etc/os-release"
+  },
+  {
+    "input": "display system uptime",
+    "output": "uptime"
+  },
+  {
+    "input": "list system uptime",
+    "output": "uptime"
+  },
+  {
+    "input": "view system uptime",
+    "output": "uptime"
+  },
+  {
+    "input": "show memory usage",
+    "output": "free -h"
+  },
+  {
+    "input": "list memory usage",
+    "output": "free -h"
+  },
+  {
+    "input": "view memory usage",
+    "output": "free -h"
+  },
+  {
+    "input": "show ram usage",
+    "output": "free -m"
+  },
+  {
+    "input": "display ram usage",
+    "output": "free -m"
+  },
+  {
+    "input": "verify ram usage",
+    "output": "free -m"
+  },
+  {
+    "input": "display cpu information",
+    "output": "lscpu"
+  },
+  {
+    "input": "list cpu information",
+    "output": "lscpu"
+  },
+  {
+    "input": "view cpu information",
+    "output": "lscpu"
+  },
+  {
+    "input": "show hardware info",
+    "output": "lshw -short"
+  },
+  {
+    "input": "list hardware info",
+    "output": "lshw -short"
+  },
+  {
+    "input": "view hardware info",
+    "output": "lshw -short"
+  },
+  {
+    "input": "show system load",
+    "output": "uptime"
+  },
+  {
+    "input": "display system load",
+    "output": "uptime"
+  },
+  {
+    "input": "verify system load",
+    "output": "uptime"
+  },
+  {
+    "input": "display logged in users",
+    "output": "who"
+  },
+  {
+    "input": "list logged in users",
+    "output": "who"
+  },
+  {
+    "input": "view logged in users",
+    "output": "who"
+  },
+  {
+    "input": "show files in directory",
+    "output": "ls -la"
+  },
+  {
+    "input": "display files in directory",
+    "output": "ls -la"
+  },
+  {
+    "input": "enumerate files in directory",
+    "output": "ls -la"
+  },
+  {
+    "input": "display hidden files",
+    "output": "ls -a"
+  },
+  {
+    "input": "list hidden files",
+    "output": "ls -a"
+  },
+  {
+    "input": "view hidden files",
+    "output": "ls -a"
+  },
+  {
+    "input": "show files with details",
+    "output": "ls -lh"
+  },
+  {
+    "input": "display files with details",
+    "output": "ls -lh"
+  },
+  {
+    "input": "enumerate files with details",
+    "output": "ls -lh"
+  },
+  {
+    "input": "search file by name",
+    "output": "find . -name filename"
+  },
+  {
+    "input": "locate file by name",
+    "output": "find . -name filename"
+  },
+  {
+    "input": "get file by name",
+    "output": "find . -name filename"
+  },
+  {
+    "input": "show file contents",
+    "output": "cat filename"
+  },
+  {
+    "input": "list file contents",
+    "output": "cat filename"
+  },
+  {
+    "input": "view file contents",
+    "output": "cat filename"
+  },
+  {
+    "input": "display file permissions",
+    "output": "ls -l filename"
+  },
+  {
+    "input": "list file permissions",
+    "output": "ls -l filename"
+  },
+  {
+    "input": "view file permissions",
+    "output": "ls -l filename"
+  },
+  {
+    "input": "make directory",
+    "output": "mkdir dirname"
+  },
+  {
+    "input": "generate directory",
+    "output": "mkdir dirname"
+  },
+  {
+    "input": "add directory",
+    "output": "mkdir dirname"
+  },
+  {
+    "input": "delete directory",
+    "output": "rm -rf dirname"
+  },
+  {
+    "input": "drop directory",
+    "output": "rm -rf dirname"
+  },
+  {
+    "input": "erase directory",
+    "output": "rm -rf dirname"
+  },
+  {
+    "input": "display environment variables",
+    "output": "printenv"
+  },
+  {
+    "input": "list environment variables",
+    "output": "printenv"
+  },
+  {
+    "input": "view environment variables",
+    "output": "printenv"
+  },
+  {
+    "input": "show path variable",
+    "output": "echo $PATH"
+  },
+  {
+    "input": "list path variable",
+    "output": "echo $PATH"
+  },
+  {
+    "input": "view path variable",
+    "output": "echo $PATH"
+  },
+  {
+    "input": "show command location",
+    "output": "which command"
+  },
+  {
+    "input": "display command location",
+    "output": "which command"
+  },
+  {
+    "input": "verify command location",
+    "output": "which command"
+  },
+  {
+    "input": "display command manual",
+    "output": "man command"
+  },
+  {
+    "input": "list command manual",
+    "output": "man command"
+  },
+  {
+    "input": "view command manual",
+    "output": "man command"
+  },
+  {
+    "input": "search text in files",
+    "output": "grep -rn 'text' *"
+  },
+  {
+    "input": "locate text in files",
+    "output": "grep -rn 'text' *"
+  },
+  {
+    "input": "get text in files",
+    "output": "grep -rn 'text' *"
+  },
+  {
+    "input": "show first lines",
+    "output": "head -n 10 filename"
+  },
+  {
+    "input": "list first lines",
+    "output": "head -n 10 filename"
+  },
+  {
+    "input": "view first lines",
+    "output": "head -n 10 filename"
+  },
+  {
+    "input": "display last lines",
+    "output": "tail -n 10 filename"
+  },
+  {
+    "input": "list last lines",
+    "output": "tail -n 10 filename"
+  },
+  {
+    "input": "view last lines",
+    "output": "tail -n 10 filename"
+  },
+  {
+    "input": "display system logs",
+    "output": "journalctl -xe"
+  },
+  {
+    "input": "list system logs",
+    "output": "journalctl -xe"
+  },
+  {
+    "input": "view system logs",
+    "output": "journalctl -xe"
+  },
+  {
+    "input": "show service status",
+    "output": "systemctl status service_name"
+  },
+  {
+    "input": "display service status",
+    "output": "systemctl status service_name"
+  },
+  {
+    "input": "verify service status",
+    "output": "systemctl status service_name"
+  },
+  {
+    "input": "show all services",
+    "output": "systemctl list-units --type=service"
+  },
+  {
+    "input": "display all services",
+    "output": "systemctl list-units --type=service"
+  },
+  {
+    "input": "enumerate all services",
+    "output": "systemctl list-units --type=service"
+  },
+  {
+    "input": "display firewall status",
+    "output": "ufw status"
+  },
+  {
+    "input": "list firewall status",
+    "output": "ufw status"
+  },
+  {
+    "input": "view firewall status",
+    "output": "ufw status"
+  },
+  {
+    "input": "show iptables rules",
+    "output": "iptables -L -v -n"
+  },
+  {
+    "input": "display iptables rules",
+    "output": "iptables -L -v -n"
+  },
+  {
+    "input": "enumerate iptables rules",
+    "output": "iptables -L -v -n"
+  },
+  {
+    "input": "display ssh connections",
+    "output": "ss -tn state established '( dport = :22 or sport = :22 )'"
+  },
+  {
+    "input": "list ssh connections",
+    "output": "ss -tn state established '( dport = :22 or sport = :22 )'"
+  },
+  {
+    "input": "view ssh connections",
+    "output": "ss -tn state established '( dport = :22 or sport = :22 )'"
+  },
+  {
+    "input": "show dns resolution",
+    "output": "nslookup google.com"
+  },
+  {
+    "input": "display dns resolution",
+    "output": "nslookup google.com"
+  },
+  {
+    "input": "verify dns resolution",
+    "output": "nslookup google.com"
+  },
+  {
+    "input": "display current directory",
+    "output": "pwd"
+  },
+  {
+    "input": "list current directory",
+    "output": "pwd"
+  },
+  {
+    "input": "view current directory",
+    "output": "pwd"
+  },
+  {
+    "input": "display command history",
+    "output": "history"
+  },
+  {
+    "input": "list command history",
+    "output": "history"
+  },
+  {
+    "input": "view command history",
+    "output": "history"
+  },
+  {
+    "input": "show website status",
+    "output": "curl -I https://example.com"
+  },
+  {
+    "input": "display website status",
+    "output": "curl -I https://example.com"
+  },
+  {
+    "input": "verify website status",
+    "output": "curl -I https://example.com"
+  },
+  {
+    "input": "display date and time",
+    "output": "date"
+  },
+  {
+    "input": "list date and time",
+    "output": "date"
+  },
+  {
+    "input": "view date and time",
+    "output": "date"
+  },
+  {
+    "input": "show calendar",
+    "output": "cal"
+  },
+  {
+    "input": "list calendar",
+    "output": "cal"
+  },
+  {
+    "input": "view calendar",
+    "output": "cal"
+  },
+  {
+    "input": "display timezone",
+    "output": "timedatectl"
+  },
+  {
+    "input": "list timezone",
+    "output": "timedatectl"
+  },
+  {
+    "input": "view timezone",
+    "output": "timedatectl"
+  },
+  {
+    "input": "show usb devices",
+    "output": "lsusb"
+  },
+  {
+    "input": "display usb devices",
+    "output": "lsusb"
+  },
+  {
+    "input": "enumerate usb devices",
+    "output": "lsusb"
+  },
+  {
+    "input": "display pci devices",
+    "output": "lspci"
+  },
+  {
+    "input": "list pci devices",
+    "output": "lspci"
+  },
+  {
+    "input": "view pci devices",
+    "output": "lspci"
+  },
+  {
+    "input": "show kernel messages",
+    "output": "dmesg | tail"
+  },
+  {
+    "input": "list kernel messages",
+    "output": "dmesg | tail"
+  },
+  {
+    "input": "view kernel messages",
+    "output": "dmesg | tail"
+  },
+  {
+    "input": "show battery status",
+    "output": "acpi -b"
+  },
+  {
+    "input": "display battery status",
+    "output": "acpi -b"
+  },
+  {
+    "input": "verify battery status",
+    "output": "acpi -b"
+  },
+  {
+    "input": "display temperature sensors",
+    "output": "sensors"
+  },
+  {
+    "input": "list temperature sensors",
+    "output": "sensors"
+  },
+  {
+    "input": "view temperature sensors",
+    "output": "sensors"
+  },
+  {
+    "input": "create static ip route",
+    "output": "ip route add 192.168.1.0/24 via 10.0.0.1"
+  },
+  {
+    "input": "insert static ip route",
+    "output": "ip route add 192.168.1.0/24 via 10.0.0.1"
+  },
+  {
+    "input": "append static ip route",
+    "output": "ip route add 192.168.1.0/24 via 10.0.0.1"
+  },
+  {
+    "input": "remove specific route",
+    "output": "ip route del 192.168.1.0/24"
+  },
+  {
+    "input": "erase specific route",
+    "output": "ip route del 192.168.1.0/24"
+  },
+  {
+    "input": "destroy specific route",
+    "output": "ip route del 192.168.1.0/24"
+  },
+  {
+    "input": "create default gateway",
+    "output": "ip route add default via 192.168.1.1"
+  },
+  {
+    "input": "insert default gateway",
+    "output": "ip route add default via 192.168.1.1"
+  },
+  {
+    "input": "append default gateway",
+    "output": "ip route add default via 192.168.1.1"
+  },
+  {
+    "input": "display kernel routing table",
+    "output": "route -n"
+  },
+  {
+    "input": "list kernel routing table",
+    "output": "route -n"
+  },
+  {
+    "input": "view kernel routing table",
+    "output": "route -n"
+  },
+  {
+    "input": "show routing cache",
+    "output": "ip route show cache"
+  },
+  {
+    "input": "list routing cache",
+    "output": "ip route show cache"
+  },
+  {
+    "input": "view routing cache",
+    "output": "ip route show cache"
+  },
+  {
+    "input": "display routing table for specific interface",
+    "output": "ip route show dev eth0"
+  },
+  {
+    "input": "list routing table for specific interface",
+    "output": "ip route show dev eth0"
+  },
+  {
+    "input": "view routing table for specific interface",
+    "output": "ip route show dev eth0"
+  },
+  {
+    "input": "display ipv6 routes",
+    "output": "ip -6 route show"
+  },
+  {
+    "input": "list ipv6 routes",
+    "output": "ip -6 route show"
+  },
+  {
+    "input": "view ipv6 routes",
+    "output": "ip -6 route show"
+  },
+  {
+    "input": "create ipv6 route",
+    "output": "ip -6 route add 2001:db8::/32 via 2001:db8::1"
+  },
+  {
+    "input": "insert ipv6 route",
+    "output": "ip -6 route add 2001:db8::/32 via 2001:db8::1"
+  },
+  {
+    "input": "append ipv6 route",
+    "output": "ip -6 route add 2001:db8::/32 via 2001:db8::1"
+  },
+  {
+    "input": "display route to specific destination",
+    "output": "ip route get 8.8.8.8"
+  },
+  {
+    "input": "list route to specific destination",
+    "output": "ip route get 8.8.8.8"
+  },
+  {
+    "input": "view route to specific destination",
+    "output": "ip route get 8.8.8.8"
+  },
+  {
+    "input": "show all iptables rules",
+    "output": "iptables -L -v -n"
+  },
+  {
+    "input": "display all iptables rules",
+    "output": "iptables -L -v -n"
+  },
+  {
+    "input": "enumerate all iptables rules",
+    "output": "iptables -L -v -n"
+  },
+  {
+    "input": "display iptables nat rules",
+    "output": "iptables -t nat -L -v -n"
+  },
+  {
+    "input": "list iptables nat rules",
+    "output": "iptables -t nat -L -v -n"
+  },
+  {
+    "input": "view iptables nat rules",
+    "output": "iptables -t nat -L -v -n"
+  },
+  {
+    "input": "display iptables mangle rules",
+    "output": "iptables -t mangle -L -v -n"
+  },
+  {
+    "input": "list iptables mangle rules",
+    "output": "iptables -t mangle -L -v -n"
+  },
+  {
+    "input": "view iptables mangle rules",
+    "output": "iptables -t mangle -L -v -n"
+  },
+  {
+    "input": "show iptables filter rules",
+    "output": "iptables -t filter -L -v -n"
+  },
+  {
+    "input": "list iptables filter rules",
+    "output": "iptables -t filter -L -v -n"
+  },
+  {
+    "input": "view iptables filter rules",
+    "output": "iptables -t filter -L -v -n"
+  },
+  {
+    "input": "display iptables rules with line numbers",
+    "output": "iptables -L -v -n --line-numbers"
+  },
+  {
+    "input": "list iptables rules with line numbers",
+    "output": "iptables -L -v -n --line-numbers"
+  },
+  {
+    "input": "view iptables rules with line numbers",
+    "output": "iptables -L -v -n --line-numbers"
+  },
+  {
+    "input": "remove iptables rule by number",
+    "output": "iptables -D INPUT 3"
+  },
+  {
+    "input": "erase iptables rule by number",
+    "output": "iptables -D INPUT 3"
+  },
+  {
+    "input": "destroy iptables rule by number",
+    "output": "iptables -D INPUT 3"
+  },
+  {
+    "input": "remove specific chain",
+    "output": "iptables -X CHAIN_NAME"
+  },
+  {
+    "input": "erase specific chain",
+    "output": "iptables -X CHAIN_NAME"
+  },
+  {
+    "input": "destroy specific chain",
+    "output": "iptables -X CHAIN_NAME"
+  },
+  {
+    "input": "display memory information",
+    "output": "cat /proc/meminfo"
+  },
+  {
+    "input": "list memory information",
+    "output": "cat /proc/meminfo"
+  },
+  {
+    "input": "view memory information",
+    "output": "cat /proc/meminfo"
+  },
+  {
+    "input": "show available memory",
+    "output": "free -h"
+  },
+  {
+    "input": "list available memory",
+    "output": "free -h"
+  },
+  {
+    "input": "view available memory",
+    "output": "free -h"
+  },
+  {
+    "input": "display memory in megabytes",
+    "output": "free -m"
+  },
+  {
+    "input": "list memory in megabytes",
+    "output": "free -m"
+  },
+  {
+    "input": "view memory in megabytes",
+    "output": "free -m"
+  },
+  {
+    "input": "show swap usage",
+    "output": "free -h | grep Swap"
+  },
+  {
+    "input": "display swap usage",
+    "output": "free -h | grep Swap"
+  },
+  {
+    "input": "verify swap usage",
+    "output": "free -h | grep Swap"
+  },
+  {
+    "input": "show detailed memory stats",
+    "output": "vmstat -s"
+  },
+  {
+    "input": "list detailed memory stats",
+    "output": "vmstat -s"
+  },
+  {
+    "input": "view detailed memory stats",
+    "output": "vmstat -s"
+  },
+  {
+    "input": "display memory usage continuously",
+    "output": "vmstat 1"
+  },
+  {
+    "input": "list memory usage continuously",
+    "output": "vmstat 1"
+  },
+  {
+    "input": "view memory usage continuously",
+    "output": "vmstat 1"
+  },
+  {
+    "input": "show memory by process",
+    "output": "ps aux --sort=-%mem | head"
+  },
+  {
+    "input": "list memory by process",
+    "output": "ps aux --sort=-%mem | head"
+  },
+  {
+    "input": "view memory by process",
+    "output": "ps aux --sort=-%mem | head"
+  },
+  {
+    "input": "display top memory consuming processes",
+    "output": "ps -eo pid,ppid,cmd,%mem,%cpu --sort=-%mem | head"
+  },
+  {
+    "input": "list top memory consuming processes",
+    "output": "ps -eo pid,ppid,cmd,%mem,%cpu --sort=-%mem | head"
+  },
+  {
+    "input": "view top memory consuming processes",
+    "output": "ps -eo pid,ppid,cmd,%mem,%cpu --sort=-%mem | head"
+  },
+  {
+    "input": "show slab memory info",
+    "output": "cat /proc/slabinfo"
+  },
+  {
+    "input": "display slab memory info",
+    "output": "cat /proc/slabinfo"
+  },
+  {
+    "input": "verify slab memory info",
+    "output": "cat /proc/slabinfo"
+  },
+  {
+    "input": "show buffer and cache usage",
+    "output": "cat /proc/meminfo | grep -E 'Buffers|Cached'"
+  },
+  {
+    "input": "list buffer and cache usage",
+    "output": "cat /proc/meminfo | grep -E 'Buffers|Cached'"
+  },
+  {
+    "input": "view buffer and cache usage",
+    "output": "cat /proc/meminfo | grep -E 'Buffers|Cached'"
+  },
+  {
+    "input": "display committed memory",
+    "output": "cat /proc/meminfo | grep Committed"
+  },
+  {
+    "input": "list committed memory",
+    "output": "cat /proc/meminfo | grep Committed"
+  },
+  {
+    "input": "view committed memory",
+    "output": "cat /proc/meminfo | grep Committed"
+  },
+  {
+    "input": "display per process memory map",
+    "output": "pmap -x PID"
+  },
+  {
+    "input": "list per process memory map",
+    "output": "pmap -x PID"
+  },
+  {
+    "input": "view per process memory map",
+    "output": "pmap -x PID"
+  },
+  {
+    "input": "show shared memory segments",
+    "output": "ipcs -m"
+  },
+  {
+    "input": "list shared memory segments",
+    "output": "ipcs -m"
+  },
+  {
+    "input": "view shared memory segments",
+    "output": "ipcs -m"
+  },
+  {
+    "input": "display network interface statistics",
+    "output": "netstat -i"
+  },
+  {
+    "input": "list network interface statistics",
+    "output": "netstat -i"
+  },
+  {
+    "input": "view network interface statistics",
+    "output": "netstat -i"
+  },
+  {
+    "input": "show network connections",
+    "output": "netstat -tunlp"
+  },
+  {
+    "input": "list network connections",
+    "output": "netstat -tunlp"
+  },
+  {
+    "input": "view network connections",
+    "output": "netstat -tunlp"
+  },
+  {
+    "input": "display tcp connections",
+    "output": "netstat -tn"
+  },
+  {
+    "input": "list tcp connections",
+    "output": "netstat -tn"
+  },
+  {
+    "input": "view tcp connections",
+    "output": "netstat -tn"
+  },
+  {
+    "input": "get device model name",
+    "output": "dmcli eRT getv Device.DeviceInfo.ModelName"
+  },
+  {
+    "input": "show device model name",
+    "output": "dmcli eRT getv Device.DeviceInfo.ModelName"
+  },
+  {
+    "input": "display device manufacturer",
+    "output": "dmcli eRT getv Device.DeviceInfo.Manufacturer"
+  },
+  {
+    "input": "get device serial number",
+    "output": "dmcli eRT getv Device.DeviceInfo.SerialNumber"
+  },
+  {
+    "input": "show hardware version",
+    "output": "dmcli eRT getv Device.DeviceInfo.HardwareVersion"
+  },
+  {
+    "input": "display software version",
+    "output": "dmcli eRT getv Device.DeviceInfo.SoftwareVersion"
+  },
+  {
+    "input": "get firmware version",
+    "output": "dmcli eRT getv Device.DeviceInfo.X_CISCO_COM_FirmwareName"
+  },
+  {
+    "input": "show device uptime",
+    "output": "dmcli eRT getv Device.DeviceInfo.UpTime"
+  },
+  {
+    "input": "display device status",
+    "output": "dmcli eRT getv Device.DeviceInfo.X_CISCO_COM_BootTime"
+  },
+  {
+    "input": "get mac address",
+    "output": "dmcli eRT getv Device.DeviceInfo.X_COMCAST-COM_CM_MAC"
+  },
+  {
+    "input": "show wan mac address",
+    "output": "dmcli eRT getv Device.DeviceInfo.X_COMCAST-COM_WAN_MAC"
+  },
+  {
+    "input": "retrieve device description",
+    "output": "dmcli eRT getv Device.DeviceInfo.Description"
+  },
+  {
+    "input": "get wifi ssid",
+    "output": "dmcli eRT getv Device.WiFi.SSID.1.SSID"
+  },
+  {
+    "input": "show wifi ssid",
+    "output": "dmcli eRT getv Device.WiFi.SSID.1.SSID"
+  },
+  {
+    "input": "display wifi password",
+    "output": "dmcli eRT getv Device.WiFi.AccessPoint.1.Security.X_COMCAST-COM_KeyPassphrase"
+  },
+  {
+    "input": "get wifi encryption mode",
+    "output": "dmcli eRT getv Device.WiFi.AccessPoint.1.Security.ModeEnabled"
+  },
+  {
+    "input": "show wifi channel",
+    "output": "dmcli eRT getv Device.WiFi.Radio.1.Channel"
+  },
+  {
+    "input": "display wifi status",
+    "output": "dmcli eRT getv Device.WiFi.Radio.1.Enable"
+  },
+  {
+    "input": "get wifi frequency band",
+    "output": "dmcli eRT getv Device.WiFi.Radio.1.OperatingFrequencyBand"
+  },
+  {
+    "input": "show wifi radio enable",
+    "output": "dmcli eRT getv Device.WiFi.Radio.1.Enable"
+  },
+  {
+    "input": "display connected wifi clients",
+    "output": "dmcli eRT getv Device.WiFi.AccessPoint.1.AssociatedDeviceNumberOfEntries"
+  },
+  {
+    "input": "get wifi bandwidth",
+    "output": "dmcli eRT getv Device.WiFi.Radio.1.OperatingChannelBandwidth"
+  },
+  {
+    "input": "show wifi transmit power",
+    "output": "dmcli eRT getv Device.WiFi.Radio.1.TransmitPower"
+  },
+  {
+    "input": "set wifi ssid",
+    "output": "dmcli eRT setv Device.WiFi.SSID.1.SSID string"
+  },
+  {
+    "input": "enable wifi radio",
+    "output": "dmcli eRT setv Device.WiFi.Radio.1.Enable bool true"
+  },
+  {
+    "input": "disable wifi radio",
+    "output": "dmcli eRT setv Device.WiFi.Radio.1.Enable bool false"
+  },
+  {
+    "input": "set wifi channel",
+    "output": "dmcli eRT setv Device.WiFi.Radio.1.Channel uint"
+  },
+  {
+    "input": "change wifi password",
+    "output": "dmcli eRT setv Device.WiFi.AccessPoint.1.Security.X_COMCAST-COM_KeyPassphrase string"
+  },
+  {
+    "input": "get lan ip address",
+    "output": "dmcli eRT getv Device.X_CISCO_COM_DeviceControl.LanManagementEntry.1.LanIPAddress"
+  },
+  {
+    "input": "show lan subnet mask",
+    "output": "dmcli eRT getv Device.X_CISCO_COM_DeviceControl.LanManagementEntry.1.LanSubnetMask"
+  },
+  {
+    "input": "display dhcp server enable",
+    "output": "dmcli eRT getv Device.DHCPv4.Server.Enable"
+  },
+  {
+    "input": "get dhcp start address",
+    "output": "dmcli eRT getv Device.DHCPv4.Server.Pool.1.MinAddress"
+  },
+  {
+    "input": "show dhcp end address",
+    "output": "dmcli eRT getv Device.DHCPv4.Server.Pool.1.MaxAddress"
+  },
+  {
+    "input": "display dhcp lease time",
+    "output": "dmcli eRT getv Device.DHCPv4.Server.Pool.1.LeaseTime"
+  },
+  {
+    "input": "get dhcp clients",
+    "output": "dmcli eRT getv Device.DHCPv4.Server.Pool.1.Client."
+  },
+  {
+    "input": "set lan ip address",
+    "output": "dmcli eRT setv Device.X_CISCO_COM_DeviceControl.LanManagementEntry.1.LanIPAddress string"
+  },
+  {
+    "input": "enable dhcp server",
+    "output": "dmcli eRT setv Device.DHCPv4.Server.Enable bool true"
+  },
+  {
+    "input": "disable dhcp server",
+    "output": "dmcli eRT setv Device.DHCPv4.Server.Enable bool false"
+  },
+  {
+    "input": "get wan ip address",
+    "output": "dmcli eRT getv Device.X_CISCO_COM_DeviceControl.WanAddressMode"
+  },
+  {
+    "input": "show wan connection status",
+    "output": "dmcli eRT getv Device.X_CISCO_COM_DeviceControl.WanCurrentState"
+  },
+  {
+    "input": "display wan ipv6 address",
+    "output": "dmcli eRT getv Device.IP.Interface.1.IPv6Address.1.IPAddress"
+  },
+  {
+    "input": "get wan link status",
+    "output": "dmcli eRT getv Device.Ethernet.Link.1.Status"
+  },
+  {
+    "input": "get nat enable status",
+    "output": "dmcli eRT getv Device.NAT.X_CISCO_COM_EnableNATMapping"
+  },
+  {
+    "input": "show port forwarding rules",
+    "output": "dmcli eRT getv Device.NAT.PortMapping."
+  },
+  {
+    "input": "get dmz host",
+    "output": "dmcli eRT getv Device.NAT.X_CISCO_COM_DMZ.Enable"
+  },
+  {
+    "input": "add port forwarding rule",
+    "output": "dmcli eRT setv Device.NAT.PortMapping.1.Enable bool true"
+  },
+  {
+    "input": "enable nat",
+    "output": "dmcli eRT setv Device.NAT.X_CISCO_COM_EnableNATMapping bool true"
+  },
+  {
+    "input": "set firewall level",
+    "output": "dmcli eRT setv Device.X_CISCO_COM_Security.Firewall.FirewallLevel string"
+  },
+  {
+    "input": "get parental control status",
+    "output": "dmcli eRT getv Device.X_Comcast_com_ParentalControl.ManagedSites.Enable"
+  },
+  {
+    "input": "show blocked sites",
+    "output": "dmcli eRT getv Device.X_Comcast_com_ParentalControl.ManagedSites.BlockedSite."
+  },
+  {
+    "input": "display parental control services",
+    "output": "dmcli eRT getv Device.X_Comcast_com_ParentalControl.ManagedServices.Service."
+  },
+  {
+    "input": "enable parental control",
+    "output": "dmcli eRT setv Device.X_Comcast_com_ParentalControl.ManagedSites.Enable bool true"
+  },
+  {
+    "input": "get current time",
+    "output": "dmcli eRT getv Device.Time.CurrentLocalTime"
+  },
+  {
+    "input": "show time zone",
+    "output": "dmcli eRT getv Device.Time.LocalTimeZone"
+  },
+  {
+    "input": "display ntp server",
+    "output": "dmcli eRT getv Device.Time.NTPServer1"
+  },
+  {
+    "input": "set time zone",
+    "output": "dmcli eRT setv Device.Time.LocalTimeZone string"
+  },
+  {
+    "input": "get log entries",
+    "output": "dmcli eRT getv Device.DeviceInfo.X_RDKCENTRAL-COM_xOpsDeviceMgmt.Logging."
+  },
+  {
+    "input": "show system log",
+    "output": "dmcli eRT getv Device.DeviceInfo.X_RDKCENTRAL-COM_xOpsDeviceMgmt.Logging.xOpsDMUploadLogsNow"
+  },
+  {
+    "input": "get cpu usage",
+    "output": "dmcli eRT getv Device.DeviceInfo.ProcessStatus.CPUUsage"
+  },
+  {
+    "input": "show process status",
+    "output": "dmcli eRT getv Device.DeviceInfo.ProcessStatus.Process."
+  },
+  {
+    "input": "trigger log upload",
+    "output": "dmcli eRT setv Device.DeviceInfo.X_RDKCENTRAL-COM_xOpsDeviceMgmt.Logging.xOpsDMUploadLogsNow bool true"
+  },
+  {
+    "input": "get acs url",
+    "output": "dmcli eRT getv Device.ManagementServer.URL"
+  },
+  {
+    "input": "show acs connection status",
+    "output": "dmcli eRT getv Device.ManagementServer.X_CISCO_COM_ConnectionRequestURLPort"
+  },
+  {
+    "input": "display periodic inform enable",
+    "output": "dmcli eRT getv Device.ManagementServer.PeriodicInformEnable"
+  },
+  {
+    "input": "get periodic inform interval",
+    "output": "dmcli eRT getv Device.ManagementServer.PeriodicInformInterval"
+  },
+  {
+    "input": "set acs url",
+    "output": "dmcli eRT setv Device.ManagementServer.URL string"
+  },
+  {
+    "input": "enable periodic inform",
+    "output": "dmcli eRT setv Device.ManagementServer.PeriodicInformEnable bool true"
+  },
+  {
+    "input": "get cm status",
+    "output": "dmcli eRT getv Device.X_CISCO_COM_CableModem.DOCSISVersion"
+  },
+  {
+    "input": "show docsis version",
+    "output": "dmcli eRT getv Device.X_CISCO_COM_CableModem.DOCSISVersion"
+  },
+  {
+    "input": "display cm downstream power",
+    "output": "dmcli eRT getv Device.X_CISCO_COM_CableModem.DownstreamPowerLevel"
+  },
+  {
+    "input": "get cm upstream power",
+    "output": "dmcli eRT getv Device.X_CISCO_COM_CableModem.UpstreamPowerLevel"
+  },
+  {
+    "input": "show cm snr",
+    "output": "dmcli eRT getv Device.X_CISCO_COM_CableModem.SNRLevel"
+  },
+  {
+    "input": "display cm channels",
+    "output": "dmcli eRT getv Device.X_CISCO_COM_CableModem.DOCSISDownstreamChannel."
+  },
+  {
+    "input": "get moca status",
+    "output": "dmcli eRT getv Device.MoCA.Interface.1.Enable"
+  },
+  {
+    "input": "show moca frequency",
+    "output": "dmcli eRT getv Device.MoCA.Interface.1.FreqCurrentMask"
+  },
+  {
+    "input": "display moca nodes",
+    "output": "dmcli eRT getv Device.MoCA.Interface.1.AssociatedDevice."
+  },
+  {
+    "input": "enable moca",
+    "output": "dmcli eRT setv Device.MoCA.Interface.1.Enable bool true"
+  },
+  {
+    "input": "disable moca",
+    "output": "dmcli eRT setv Device.MoCA.Interface.1.Enable bool false"
+  },
+  {
+    "input": "get ethernet port status",
+    "output": "dmcli eRT getv Device.Ethernet.Interface.1.Status"
+  },
+  {
+    "input": "show ethernet link speed",
+    "output": "dmcli eRT getv Device.Ethernet.Interface.1.CurrentBitRate"
+  },
+  {
+    "input": "display ethernet duplex mode",
+    "output": "dmcli eRT getv Device.Ethernet.Interface.1.DuplexMode"
+  },
+  {
+    "input": "get usb status",
+    "output": "dmcli eRT getv Device.USB.Interface.1.Enable"
+  },
+  {
+    "input": "get remote access enable",
+    "output": "dmcli eRT getv Device.UserInterface.X_CISCO_COM_RemoteAccess.Enable"
+  },
+  {
+    "input": "show remote access port",
+    "output": "dmcli eRT getv Device.UserInterface.X_CISCO_COM_RemoteAccess.Port"
+  },
+  {
+    "input": "enable remote access",
+    "output": "dmcli eRT setv Device.UserInterface.X_CISCO_COM_RemoteAccess.Enable bool true"
+  },
+  {
+    "input": "factory reset device",
+    "output": "dmcli eRT setv Device.X_CISCO_COM_DeviceControl.FactoryReset string Router,Wifi,VoIP,Dect,MoCA"
+  },
+  {
+    "input": "reboot device",
+    "output": "dmcli eRT setv Device.X_CISCO_COM_DeviceControl.RebootDevice string Device"
+  },
+  {
+    "input": "reset wifi settings",
+    "output": "dmcli eRT setv Device.X_CISCO_COM_DeviceControl.FactoryReset string Wifi"
+  },
+  {
+    "input": "get qos enable",
+    "output": "dmcli eRT getv Device.X_CISCO_COM_DeviceControl.QoSEnable"
+  },
+  {
+    "input": "enable qos",
+    "output": "dmcli eRT setv Device.X_CISCO_COM_DeviceControl.QoSEnable bool true"
+  },
+  {
+    "input": "get bridge mode status",
+    "output": "dmcli eRT getv Device.X_CISCO_COM_DeviceControl.LanMode"
+  },
+  {
+    "input": "enable bridge mode",
+    "output": "dmcli eRT setv Device.X_CISCO_COM_DeviceControl.LanMode string bridge-static"
+  },
+  {
+    "input": "disable bridge mode",
+    "output": "dmcli eRT setv Device.X_CISCO_COM_DeviceControl.LanMode string router"
+  },
+  {
+    "input": "get wifi country code",
+    "output": "dmcli eRT getv Device.WiFi.Radio.1.RegulatoryDomain"
+  },
+  {
+    "input": "show wifi operating standard",
+    "output": "dmcli eRT getv Device.WiFi.Radio.1.OperatingStandards"
+  },
+  {
+    "input": "display wifi beacon interval",
+    "output": "dmcli eRT getv Device.WiFi.Radio.1.BeaconPeriod"
+  },
+  {
+    "input": "get wifi dtim interval",
+    "output": "dmcli eRT getv Device.WiFi.Radio.1.DTIMPeriod"
+  },
+  {
+    "input": "show wifi guard interval",
+    "output": "dmcli eRT getv Device.WiFi.Radio.1.GuardInterval"
+  },
+  {
+    "input": "display wifi wmm enable",
+    "output": "dmcli eRT getv Device.WiFi.AccessPoint.1.WMMEnable"
+  },
+  {
+    "input": "get wifi mac filter mode",
+    "output": "dmcli eRT getv Device.WiFi.AccessPoint.1.MACAddressControlEnabled"
+  },
+  {
+    "input": "get guest wifi ssid",
+    "output": "dmcli eRT getv Device.WiFi.SSID.5.SSID"
+  },
+  {
+    "input": "show guest wifi status",
+    "output": "dmcli eRT getv Device.WiFi.SSID.5.Enable"
+  },
+  {
+    "input": "enable guest wifi",
+    "output": "dmcli eRT setv Device.WiFi.SSID.5.Enable bool true"
+  },
+  {
+    "input": "disable guest wifi",
+    "output": "dmcli eRT setv Device.WiFi.SSID.5.Enable bool false"
+  },
+  {
+    "input": "set guest wifi ssid",
+    "output": "dmcli eRT setv Device.WiFi.SSID.5.SSID string"
+  },
+  {
+    "input": "get ipv6 enable",
+    "output": "dmcli eRT getv Device.IP.IPv6Enable"
+  },
+  {
+    "input": "show ipv6 address",
+    "output": "dmcli eRT getv Device.IP.Interface.1.IPv6Address."
+  },
+  {
+    "input": "enable ipv6",
+    "output": "dmcli eRT setv Device.IP.IPv6Enable bool true"
+  },
+  {
+    "input": "get dns servers",
+    "output": "dmcli eRT getv Device.DNS.Client.Server."
+  },
+  {
+    "input": "show primary dns",
+    "output": "dmcli eRT getv Device.DNS.Client.Server.1.DNSServer"
+  },
+  {
+    "input": "set dns server",
+    "output": "dmcli eRT setv Device.DNS.Client.Server.1.DNSServer string"
   }
 ]

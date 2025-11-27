@@ -1,6 +1,6 @@
 # Quick Start Guide
 
-This guide will help you get started with the seq2sec-cmd-generator in minutes.
+This guide will help you get started with the seq2sec-cmd-generator in minutes. Learn how to train a seq2seq model that translates natural language to Linux/RDKB commands.
 
 ## Prerequisites
 
@@ -37,20 +37,27 @@ python scripts/train.py
 Expected output:
 ```
 Using device: cuda
-Training samples: 96
-Validation samples: 24
-Input vocabulary size: 215
-Output vocabulary size: 156
-Model parameters: 56,472
+Dataset loaded: 611 samples
+Training samples: 519
+Validation samples: 92
+Input vocabulary size: 326
+Output vocabulary size: 412
+Model parameters: 6,705,053
 
-Epoch 1/50
-Training: 100%|██████████| 6/6 [00:02<00:00]
-Train Loss: 3.8542
-Val Loss: 3.6234
+Epoch 1/100
+Training: 100%|██████████| 33/33 [00:03<00:00,  9.45it/s]
+Evaluating: 100%|██████████| 6/6 [00:00<00:00, 15.23it/s]
+Train Loss: 4.2134, Val Loss: 4.0521
 Saved best model!
+
+...
+
+Epoch 68/100
+Train Loss: 0.9823, Val Loss: 1.3453
+Training completed! Best validation loss: 1.3453
 ```
 
-Training takes approximately 5-10 minutes on a modern GPU.
+Training takes approximately 20-30 minutes on a modern GPU (RTX 5060) for 611 samples with 2-layer GRU.
 
 ### 4. Export to ONNX
 
@@ -74,6 +81,7 @@ python cli/cmd_generator.py interactive
 
 Try these natural language instructions:
 
+**Linux Commands:**
 ```bash
 python cli/cmd_generator.py generate "show network interfaces"
 # Output: ifconfig
@@ -87,8 +95,23 @@ python cli/cmd_generator.py generate "show disk usage"
 python cli/cmd_generator.py generate "display running processes"
 # Output: ps aux
 
-python cli/cmd_generator.py generate "show current directory"
-# Output: pwd
+python cli/cmd_generator.py generate "show memory usage"
+# Output: free -h
+```
+
+**RDKB Commands:**
+```bash
+python cli/cmd_generator.py generate "show wifi ssid"
+# Output: dmcli eRT getv Device.WiFi.SSID.1.SSID
+
+python cli/cmd_generator.py generate "get device model name"
+# Output: dmcli eRT getv Device.DeviceInfo.ModelName
+
+python cli/cmd_generator.py generate "show lan ip address"
+# Output: dmcli eRT getv Device.LAN.IPAddress
+
+python cli/cmd_generator.py generate "get wifi password"
+# Output: dmcli eRT getv Device.WiFi.AccessPoint.1.Security.KeyPassphrase
 ```
 
 ## Interactive Mode
@@ -111,50 +134,105 @@ Enter instruction: quit
 Goodbye!
 ```
 
-## For Embedded Systems
+## For Embedded Systems (RDK-B Devices)
 
-To use quantized models optimized for embedded systems:
+To use INT8 quantized models optimized for embedded systems:
 
 ```bash
 python cli/cmd_generator.py generate "your instruction" --quantized
 ```
 
-Quantized models are:
-- ~50% smaller in size
-- ~2-3x faster inference
-- Slightly lower accuracy (typically <5% difference)
+Quantized models (INT8) are:
+- 4.5% smaller in size (24.45 MB vs 25.59 MB FP32)
+- Faster inference (40-80ms vs 50-100ms)
+- Minimal accuracy loss (<2% difference)
+- Recommended for RDK-B and resource-constrained devices
+
+**Model Comparison:**
+| Model Type | Size | Inference Time | Use Case |
+|------------|------|----------------|----------|
+| FP32 Standard | 25.59 MB | 50-100ms | Development/Testing |
+| INT8 Quantized | 24.45 MB | 40-80ms | Production/Embedded |
 
 ## Adding Custom Commands
 
-1. Edit `data/commands_dataset.csv`
-2. Add new rows with format: `natural language instruction,linux command`
-3. Retrain: `python scripts/train.py`
-4. Re-export: `python scripts/export_onnx.py`
+### Method 1: Edit Existing Dataset
 
-Example:
-```csv
-input,output
-show my IP address,hostname -I
-check internet connection,ping -c 4 google.com
+Edit `data/commands-dataset.json`:
+```json
+[
+  {
+    "input": "show my IP address",
+    "output": "hostname -I"
+  },
+  {
+    "input": "check internet connection",
+    "output": "ping -c 4 google.com"
+  },
+  {
+    "input": "get wifi channel",
+    "output": "dmcli eRT getv Device.WiFi.Radio.1.Channel"
+  }
+]
 ```
+
+### Method 2: Use RDKB Command Generator
+
+Add comprehensive RDKB commands automatically:
+```bash
+python scripts/add_rdkb_commands.py
+```
+
+This adds 111 RDKB dmcli commands for WiFi, LAN, WAN, firewall, and more.
+
+### After Adding Commands
+
+1. Retrain: `python scripts/train.py`
+2. Re-export: `python scripts/export_onnx.py`
+3. Test: `python cli/cmd_generator.py generate "your new command"`
 
 ## Troubleshooting
 
 **Error**: "No module named 'torch'"
-- **Solution**: Install PyTorch: `pip install torch`
+- **Solution**: Install PyTorch: `pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118`
 
 **Error**: "CUDA out of memory"
-- **Solution**: Reduce batch_size in `config/train_config.yaml`
+- **Solution**: Reduce batch_size in `config/train_config.yaml` from 16 to 8
 
 **Error**: "Models not found"
-- **Solution**: Train and export models first
+- **Solution**: Train and export models first:
+  ```bash
+  python scripts/train.py
+  python scripts/export_onnx.py
+  ```
+
+**Error**: "Empty output or <END> token only"
+- **Solution**: Model needs more training data. Current dataset has 611 samples, which should be sufficient. If you modified the dataset, ensure it has at least 200-300 samples.
+
+**Issue**: "dmcli commands have spaces (device . wifi . ssid)"
+- **Solution**: This is automatically fixed by post-processing in `scripts/data_utils.py`. Output should be `Device.WiFi.SSID.1.SSID`.
 
 ## Next Steps
 
-- Review the full [README.md](README.md) for detailed documentation
-- Check out the [Configuration Guide](config/train_config.yaml)
+- Review the full [README.md](../README.md) for detailed documentation
+- Deploy to embedded devices: [DEPLOYMENT.md](DEPLOYMENT.md)
+- Check the [Configuration Guide](../config/train_config.yaml) for hyperparameter tuning
 - Run unit tests: `pytest tests/`
-- Experiment with different model architectures
+- Experiment with different model architectures (embedding_dim, hidden_dim, num_layers)
+- Add more RDKB commands for your specific device
+- Test ONNX Runtime: `python scripts/test_onnx_runtime.py`
+
+## Model Specifications
+
+**Current Model:**
+- Architecture: 2-layer GRU encoder-decoder with attention
+- Parameters: 6,705,053 (6.7M)
+- Embedding: 256-dim, Hidden: 512-dim
+- Vocabulary: Input=326, Output=412
+- Dataset: 611 samples (Linux + RDKB)
+- Best Validation Loss: 1.3453
+- ONNX FP32: 25.59 MB
+- ONNX INT8: 24.45 MB
 
 ## Support
 
