@@ -28,7 +28,7 @@ This project implements a sequence-to-sequence (seq2seq) model optimized for emb
 
 ## Validation & Performance
 
-✅ **Embedded Deployment Verified**: The C++ application (`deployment-cpp-yocto`) has been successfully tested on target embedded devices.
+✅ **Embedded Deployment Verified**: The C++ application (`deployment-cpp-yocto`) has been successfully tested on target embedded devices running with Dual core ATOM x86_64bit processor.
 
 - **Accuracy**: Both Float32 (High Accuracy) and INT8 (Quantized) models demonstrate good accuracy on the target hardware.
 - **Performance**: The INT8 model provides faster inference with minimal accuracy loss, making it ideal for resource-constrained environments.
