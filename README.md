@@ -26,6 +26,14 @@ This project implements a sequence-to-sequence (seq2seq) model optimized for emb
 - 📊 **Extensible Dataset**: 611 samples covering Linux + RDKB commands
 - 🔧 **RDKB Support**: Comprehensive RDK Broadband dmcli command generation
 
+## Validation & Performance
+
+✅ **Embedded Deployment Verified**: The C++ application (`deployment-cpp-yocto`) has been successfully tested on target embedded devices.
+
+- **Accuracy**: Both Float32 (High Accuracy) and INT8 (Quantized) models demonstrate good accuracy on the target hardware.
+- **Performance**: The INT8 model provides faster inference with minimal accuracy loss, making it ideal for resource-constrained environments.
+- **Future Improvement**: While current accuracy is good, achieving perfect command generation across all edge cases requires expanding the training dataset further.
+
 ## Installation
 
 ### Prerequisites
