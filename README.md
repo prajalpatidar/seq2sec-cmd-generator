@@ -22,6 +22,7 @@ This project implements a sequence-to-sequence (seq2seq) model optimized for emb
 - 📦 **Small Model Size**: ~25MB ONNX models (24.45MB INT8 quantized)
 - ⚡ **Fast Inference**: ONNX Runtime with INT8 quantization
 - 🎯 **Simple CLI**: Easy-to-use command-line interface
+- 🎛️ **Flexible Precision**: Support for INT8 (fastest), FP16, and FP32 (most accurate) models
 - 📊 **Extensible Dataset**: 611 samples covering Linux + RDKB commands
 - 🔧 **RDKB Support**: Comprehensive RDK Broadband dmcli command generation
 
@@ -63,7 +64,8 @@ seq2sec-cmd-generator/
 ├── scripts/
 │   ├── data_utils.py             # Data preprocessing utilities
 │   ├── train.py                  # Training script
-│   ├── export_onnx.py            # ONNX export script (FP32 + INT8)
+│   ├── export_onnx.py            # ONNX export script (FP32 + INT8 + FP16)
+│   ├── count_parameters.py       # Model parameter counter
 │   ├── test_onnx_runtime.py      # ONNX Runtime validation
 │   └── add_rdkb_commands.py      # RDKB dataset generator
 ├── cli/
