@@ -1,21 +1,66 @@
 # Training configuration for seq2seq model
 # Optimized for embedded systems deployment
 
-# Model hyperparameters
-embedding_dim: 256       # Increased for better representation
-hidden_dim: 512          # Increased capacity for better learning
-num_layers: 2            # Two layers for deeper learning
+# ==========================================
+# Model Hyperparameters
+# ==========================================
 
-# Training hyperparameters
-batch_size: 16           # Increased batch size with larger dataset
-num_epochs: 250          # More epochs for convergence
-learning_rate: 0.0002    # Slightly lower for stability with larger model
-teacher_forcing_ratio: 0.3  # Moderate teacher forcing for balance
+# embedding_dim: Size of the vector representation for each word.
+# Higher values capture more semantic meaning but increase model size.
+# 256 is a good balance for this vocabulary size.
+embedding_dim: 256
 
-# Data parameters
-max_vocab_size: 1500     # Increased vocabulary for expanded dataset
-train_split: 0.85        # More training data
+# hidden_dim: Size of the internal memory (state) of the GRU/LSTM layers.
+# Determines how much context the model can remember.
+# 512 allows remembering complex command structures.
+hidden_dim: 512
 
+# num_layers: Number of stacked RNN layers.
+# More layers allow learning more complex patterns (deep learning).
+# 2 layers is sufficient for this task without being too slow on embedded devices.
+num_layers: 2
+
+# ==========================================
+# Training Hyperparameters
+# ==========================================
+
+# batch_size: Number of training samples processed before updating the model.
+# Larger batches are faster but require more memory.
+# 16 is small enough for CPU training and provides frequent updates.
+batch_size: 16
+
+# num_epochs: Number of complete passes through the entire training dataset.
+# 250 ensures the model sees the data enough times to converge (minimize error).
+num_epochs: 250
+
+# learning_rate: Step size for the optimizer (Adam).
+# Controls how much we change the weights during each update.
+# 0.0002 is conservative/stable to prevent overshooting the optimal solution.
+learning_rate: 0.0002
+
+# teacher_forcing_ratio: Probability (0.0 to 1.0) of using the actual target output
+# as the next input during training, instead of the model's own prediction.
+# 0.3 means 30% of the time we "cheat" and show the right answer to help it learn.
+teacher_forcing_ratio: 0.3
+
+# ==========================================
+# Data Parameters
+# ==========================================
+
+# max_vocab_size: Maximum number of unique words to keep in the vocabulary.
+# Less frequent words beyond this limit are treated as <UNK> (unknown).
+# 1500 covers most Linux commands and English descriptions.
+max_vocab_size: 1500
+
+# train_split: Fraction of data used for training (0.85 = 85%).
+# The remaining 15% is used for validation to check for overfitting.
+train_split: 0.85
+
+# ==========================================
 # Optimization
+# ==========================================
+
+# weight_decay: L2 Regularization term.
+# Penalizes large weights to prevent overfitting (memorizing the data).
 weight_decay: 0.0001
 gradient_clip: 1.0

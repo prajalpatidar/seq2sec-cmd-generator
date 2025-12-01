@@ -23,8 +23,19 @@ def demonstrate_training_data():
     print("=" * 60)
 
     import pandas as pd
+    import json
 
-    df = pd.read_csv("../data/commands_dataset.csv")
+    # Load JSON dataset instead of CSV
+    # Use absolute path relative to this script
+    data_path = os.path.join(os.path.dirname(__file__), "..", "data", "commands-dataset.json")
+    
+    try:
+        with open(data_path, 'r') as f:
+            data = json.load(f)
+        df = pd.DataFrame(data)
+    except FileNotFoundError:
+        print(f"Error: Dataset not found at {data_path}")
+        return
 
     print(f"\nDataset size: {len(df)} command pairs\n")
     print("Sample natural language → Linux command mappings:")

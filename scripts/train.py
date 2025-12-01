@@ -22,10 +22,15 @@ from scripts.data_utils import Tokenizer, Dataset, collate_fn
 def load_data(data_path: str, train_split: float = 0.8):
     """
     Load and split dataset.
+    
+    This function reads the dataset (JSON or CSV), shuffles it to ensure randomness,
+    and splits it into two parts:
+    1. Training set (used to teach the model)
+    2. Validation set (used to test how well the model is learning on unseen data)
 
     Args:
         data_path: Path to CSV or JSON file
-        train_split: Fraction of data to use for training
+        train_split: Fraction of data to use for training (e.g., 0.8 means 80%)
     Returns:
         Tuple of (train_inputs, train_outputs, val_inputs, val_outputs)
     """
@@ -39,10 +44,10 @@ def load_data(data_path: str, train_split: float = 0.8):
     else:
         df = pd.read_csv(data_path)
 
-    # Shuffle data
+    # Shuffle data (randomize order) to prevent the model from learning order-based biases
     df = df.sample(frac=1, random_state=42).reset_index(drop=True)
 
-    # Split data
+    # Split data into training and validation sets
     split_idx = int(len(df) * train_split)
     train_df = df[:split_idx]
     val_df = df[split_idx:]
@@ -57,39 +62,51 @@ def load_data(data_path: str, train_split: float = 0.8):
 
 def train_epoch(model, dataloader, optimizer, criterion, device, teacher_forcing_ratio=0.5):
     """
-    Train for one epoch.
+    Train for one epoch (one complete pass through the training dataset).
 
     Args:
-        model: Seq2SeqModel
-        dataloader: DataLoader
-        optimizer: Optimizer
-        criterion: Loss function
-        device: Device to train on
-        teacher_forcing_ratio: Teacher forcing ratio
+        model: The Seq2Seq neural network model
+        dataloader: Feeds data in batches
+        optimizer: The algorithm that updates model weights (e.g., Adam)
+        criterion: The loss function (calculates error)
+        device: CPU or GPU
+        teacher_forcing_ratio: Probability of using the real target output as the next input
+                             during training, instead of the model's own previous prediction.
+                             Helps model learn faster.
     Returns:
         Average loss for the epoch
     """
+    # Set model to training mode (enables features like Dropout)
     model.train()
     total_loss = 0
 
     for src, tgt in tqdm(dataloader, desc="Training"):
+        # Move data to the active device (GPU or CPU)
         src, tgt = src.to(device), tgt.to(device)
 
+        # Clear gradients from the previous batch (buffers must be reset)
         optimizer.zero_grad()
 
-        # Forward pass
+        # Forward pass: The model processes input and predicts output
         output = model(src, tgt, teacher_forcing_ratio)
 
         # Reshape for loss calculation
+        # The Loss function expects a flat list of predictions and targets
+        # We skip the first token (usually <SOS> start-of-sequence)
         output = output[:, 1:].reshape(-1, output.size(-1))
         tgt = tgt[:, 1:].reshape(-1)
 
-        # Calculate loss
+        # Calculate loss (how different was the prediction from the actual target?)
         loss = criterion(output, tgt)
 
-        # Backward pass
+        # Backward pass (Backpropagation): Calculate gradients
+        # This figures out how much each weight contributed to the error
         loss.backward()
+        
+        # Gradient Clipping: Prevents "exploding gradients" where numbers get too large
         torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
+        
+        # Update model weights based on the calculated gradients
         optimizer.step()
 
         total_loss += loss.item()
@@ -100,6 +117,9 @@ def train_epoch(model, dataloader, optimizer, criterion, device, teacher_forcing
 def evaluate(model, dataloader, criterion, device):
     """
     Evaluate model on validation set.
+    
+    This checks the model's performance on data it hasn't seen during training.
+    We don't update weights here.
 
     Args:
         model: Seq2SeqModel
@@ -109,14 +129,16 @@ def evaluate(model, dataloader, criterion, device):
     Returns:
         Average loss for the validation set
     """
+    # Set model to evaluation mode (disables Dropout, etc.)
     model.eval()
     total_loss = 0
 
+    # Disable gradient calculation (saves memory and computation since we aren't training)
     with torch.no_grad():
         for src, tgt in tqdm(dataloader, desc="Evaluating"):
             src, tgt = src.to(device), tgt.to(device)
 
-            # Forward pass (no teacher forcing during evaluation)
+            # Forward pass (no teacher forcing during evaluation - model must rely on itself)
             output = model(src, tgt, teacher_forcing_ratio=0)
 
             # Reshape for loss calculation
@@ -133,12 +155,12 @@ def evaluate(model, dataloader, criterion, device):
 def main():
     """Main training function."""
 
-    # Load configuration
+    # Load configuration (hyperparameters like learning rate, batch size, etc.)
     config_path = os.path.join(os.path.dirname(__file__), "..", "config", "train_config.yaml")
     with open(config_path, "r") as f:
         config = yaml.safe_load(f)
 
-    # Set device
+    # Set device: Use GPU (cuda) if available for faster training, otherwise CPU
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"Using device: {device}")
 
@@ -152,17 +174,18 @@ def main():
     print(f"Validation samples: {len(val_inputs)}")
 
     # Create tokenizers
+    # Tokenizers convert text (words) into numbers (IDs) that the model can understand
     input_tokenizer = Tokenizer(level="word")
     output_tokenizer = Tokenizer(level="word")
 
-    # Fit tokenizers
+    # Fit tokenizers: Learn the vocabulary (list of all unique words) from the data
     input_tokenizer.fit(train_inputs + val_inputs, max_vocab_size=config["max_vocab_size"])
     output_tokenizer.fit(train_outputs + val_outputs, max_vocab_size=config["max_vocab_size"])
 
     print(f"Input vocabulary size: {len(input_tokenizer)}")
     print(f"Output vocabulary size: {len(output_tokenizer)}")
 
-    # Save tokenizers
+    # Save tokenizers so we can use them later for inference (prediction)
     os.makedirs(
         os.path.join(os.path.dirname(__file__), "..", "models", "checkpoints"), exist_ok=True
     )
@@ -177,11 +200,11 @@ def main():
         )
     )
 
-    # Create datasets
+    # Create datasets: Wraps data and tokenizers to provide easy access
     train_dataset = Dataset(train_inputs, train_outputs, input_tokenizer, output_tokenizer)
     val_dataset = Dataset(val_inputs, val_outputs, input_tokenizer, output_tokenizer)
 
-    # Create dataloaders
+    # Create dataloaders: Handles batching and shuffling of data
     train_dataloader = DataLoader(
         train_dataset, batch_size=config["batch_size"], shuffle=True, collate_fn=collate_fn
     )
@@ -190,6 +213,9 @@ def main():
     )
 
     # Create model
+    # embedding_dim: Size of the vector representation for each word
+    # hidden_dim: Size of the internal memory of the LSTM/GRU
+    # num_layers: Number of stacked RNN layers
     model = Seq2SeqModel(
         input_vocab_size=len(input_tokenizer),
         output_vocab_size=len(output_tokenizer),
@@ -201,7 +227,11 @@ def main():
     print(f"Model parameters: {sum(p.numel() for p in model.parameters())}")
 
     # Loss and optimizer
+    # CrossEntropyLoss: Measures difference between predicted word and actual word
+    # ignore_index=0: Don't calculate loss for padding tokens (0)
     criterion = nn.CrossEntropyLoss(ignore_index=0)
+    
+    # Adam Optimizer: Algorithm to update weights (standard choice for deep learning)
     optimizer = optim.Adam(model.parameters(), lr=config["learning_rate"])
 
     # Training loop
@@ -224,6 +254,7 @@ def main():
         print(f"Val Loss: {val_loss:.4f}")
 
         # Save best model
+        # We only save the model if it performs better on the validation set
         if val_loss < best_val_loss:
             best_val_loss = val_loss
             patience_counter = 0
@@ -248,7 +279,8 @@ def main():
             patience_counter += 1
             print(f"No improvement for {patience_counter} epoch(s)")
             
-            # Early stopping
+            # Early stopping: Stop training if model stops improving
+            # This prevents "overfitting" (memorizing training data instead of learning patterns)
             if patience_counter >= patience:
                 print(f"\nEarly stopping triggered after {epoch + 1} epochs")
                 break

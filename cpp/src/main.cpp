@@ -10,8 +10,9 @@ void printUsage(const char* program_name) {
               << "  interactive               Interactive mode\n"
               << "  batch <file>              Process batch file\n"
               << "\nOptions:\n"
-              << "  --encoder <path>          Encoder model path (default: models/onnx/encoder_quantized.onnx)\n"
-              << "  --decoder <path>          Decoder model path (default: models/onnx/decoder_quantized.onnx)\n"
+              << "  --encoder <path>          Encoder model path (default: depends on model-type)\n"
+              << "  --decoder <path>          Decoder model path (default: depends on model-type)\n"
+              << "  --model-type <type>       Model type: int8 (default) or float32\n"
               << "  --input-vocab <path>      Input vocabulary (default: models/checkpoints/input_vocab.txt)\n"
               << "  --output-vocab <path>     Output vocabulary (default: models/checkpoints/output_vocab.txt)\n"
               << "  --max-length <n>          Maximum output length (default: 50)\n"
@@ -24,10 +25,11 @@ void printUsage(const char* program_name) {
 
 int main(int argc, char* argv[]) {
     // Default paths
-    std::string encoder_path = "models/onnx/encoder_quantized.onnx";
-    std::string decoder_path = "models/onnx/decoder_quantized.onnx";
+    std::string encoder_path = "";
+    std::string decoder_path = "";
     std::string input_vocab_path = "models/checkpoints/input_vocab.txt";
     std::string output_vocab_path = "models/checkpoints/output_vocab.txt";
+    std::string model_type = "int8"; // Default to quantized
     int max_length = 50;
     
     if (argc < 2) {
@@ -50,11 +52,34 @@ int main(int argc, char* argv[]) {
             output_vocab_path = argv[++i];
         } else if (arg == "--max-length" && i + 1 < argc) {
             max_length = std::stoi(argv[++i]);
+        } else if (arg == "--model-type" && i + 1 < argc) {
+            model_type = argv[++i];
+        }
+    }
+
+    // Set default paths based on model type if not provided
+    if (encoder_path.empty()) {
+        if (model_type == "float32" || model_type == "f32") {
+            encoder_path = "models/onnx/encoder.onnx";
+        } else {
+            encoder_path = "models/onnx/encoder_quantized.onnx";
+        }
+    }
+
+    if (decoder_path.empty()) {
+        if (model_type == "float32" || model_type == "f32") {
+            decoder_path = "models/onnx/decoder.onnx";
+        } else {
+            decoder_path = "models/onnx/decoder_quantized.onnx";
         }
     }
     
     // Initialize inference engine
     std::cout << "Initializing seq2seq command generator..." << std::endl;
+    std::cout << "Model Type: " << model_type << std::endl;
+    std::cout << "Encoder: " << encoder_path << std::endl;
+    std::cout << "Decoder: " << decoder_path << std::endl;
+
     Seq2SeqInference inference;
     
     if (!inference.initialize(encoder_path, decoder_path, input_vocab_path, output_vocab_path, true)) {
