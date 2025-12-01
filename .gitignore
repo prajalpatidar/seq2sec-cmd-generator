@@ -75,6 +75,13 @@ onnxruntime/
 deployment-cpp/
 deployment-python/
 
+# Deployment packages
+deployment-cpp-yocto/
+*.tar.gz
+
+# Yocto build directory
+cpp/build_yocto/
+
 # Model checkpoints (too large)
 models/checkpoints/*.pth
 models/checkpoints/*.pkl
