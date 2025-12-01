@@ -12,7 +12,7 @@ with open("requirements.txt", "r", encoding="utf-8") as fh:
 
 setup(
     name="seq2sec-cmd-generator",
-    version="2.3.0",
+    version="2.3.1",
     author="Your Name",
     description="Lightweight AI model for translating natural language to Linux commands",
     long_description=long_description,
